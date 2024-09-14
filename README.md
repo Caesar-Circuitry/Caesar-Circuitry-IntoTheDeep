@@ -1,10 +1,11 @@
 # Caesar Circuitry Into the deep
 Season code for Caesar Circuitry, which came from our quickstart that has pre-installed RR 1.0, FTCLib, and Photon
 
-This repository includes RR 1.0, FTCLib, and Photon
+This repository includes RR 1.0, FTCLib, Photon, and Pedro pathing
 Check out the docs for Roadrunner [docs](https://rr.brott.dev/docs/v1-0/tuning/).
 Check out the docs for FTCLib [docs](https://docs.ftclib.org/ftclib).
 Check out the docs for Photon [docs](https://photondocs.pages.dev/introduction/getting-started).
+Check out the docs for Pedro Pathing [docs](https://pedropathing.com/Pedro+Pathing)
 
 
 ## NOTICE
