@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Robot.CustomMath.PDFL;
 
@@ -34,9 +33,9 @@ public class ViperSlide {
     // Store the target motor speed (from -1 to 1)
     double targetMotorSpeed = 0;
 
-    public ViperSlide(HardwareMap hardwareMap, GlobalVars vars){
-        Slide = hardwareMap.get(DcMotor.class,"Slide");
-        Slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    public ViperSlide(DcMotor Slide, GlobalVars vars){
+        this.Slide = Slide;
+        this.Slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         PDFLController = new PDFL(kP,kD,kF,kL);
         this.vars = vars;
     }
