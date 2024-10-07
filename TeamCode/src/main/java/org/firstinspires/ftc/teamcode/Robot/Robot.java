@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.outoftheboxrobotics.photoncore.Photon;
-import com.outoftheboxrobotics.photoncore.hardware.PhotonLynxVoltageSensor;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -15,10 +12,8 @@ import java.util.List;
 
 @Config
 public class Robot {
-    private GlobalVars vars;
-    private ViperSlide viperVertical, viperHoriontal;
+    private ViperSlide viperVertical;
     private List<LynxModule> allHubs;
-    //private PhotonLynxVoltageSensor voltageSensor;
     public driveTrain driveTrain;
     public viperRotate rotate;
     private DcMotor
@@ -31,24 +26,29 @@ public class Robot {
     /*Intake*/ intakePivot;
     private double voltage;
     public double viperRotateHome = 10, viperRotateMiddle = 90,viperRotateBucket = 140;
+    public static double targetRotate = 0, targetViper = 0;
 
     public Robot(HardwareMap hardwareMap){
         allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
-        //voltageSensor = hardwareMap.getAll(PhotonLynxVoltageSensor.class).iterator().next();
-        vars = new GlobalVars(new Pose2d(0,0,0));
-        //viperVertical = new ViperSlide(viperVerticalMotor, vars);
         frontLeftMotor = hardwareMap.get(DcMotor.class,"FLM");
         frontRightMotor = hardwareMap.get(DcMotor.class,"FRM");
         backLeftMotor = hardwareMap.get(DcMotor.class,"BLM");
         backRightMotor = hardwareMap.get(DcMotor.class,"BRM");
 
         viperRotate = hardwareMap.get(DcMotor.class,"armRotate");
+        viperRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         viperRotate.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        viperRotate.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        viperVerticalMotor = hardwareMap.get(DcMotor.class,"viper");
+        viperVerticalMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        viperVerticalMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         rotate = new viperRotate(viperRotate);
+        viperVertical = new ViperSlide(viperVerticalMotor);
 
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -61,12 +61,18 @@ public class Robot {
         driveTrain = new driveTrain(frontLeftMotor,frontRightMotor,backLeftMotor,backRightMotor);
     }
 
-    public void periodic(){//recommended that used at end of loop
-        //viperVertical.periodic();
-        //viperHoriontal.periodic();
+    public void resetEncoders(){
+        viperVerticalMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        viperRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        viperVerticalMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        viperRotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
 
-        //driveTrain.periodic();
-        //voltage = voltageSensor.getCachedVoltage();
+    public void periodic(){//recommended that used at end of loop
+        viperVertical.periodic();
+        driveTrain.periodic();
+        rotate.setTargetAngle(targetRotate);
+        viperVertical.setTargetPos(targetViper);
         rotate.periodic();
 
         //Should be last thing
@@ -78,13 +84,13 @@ public class Robot {
         return voltage;
     }
     public void rotateHome(){
-        this.rotate.setTargetAngle(viperRotateHome);
+        //this.rotate.setTargetAngle(viperRotateHome);
     }
     public void rotateMiddle(){
-        this.rotate.setTargetAngle(viperRotateMiddle);
+        //this.rotate.setTargetAngle(viperRotateMiddle);
     }
     public void rotateBucket(){
-        this.rotate.setTargetAngle(viperRotateBucket);
+        //this.rotate.setTargetAngle(viperRotateBucket);
     }
 
 
