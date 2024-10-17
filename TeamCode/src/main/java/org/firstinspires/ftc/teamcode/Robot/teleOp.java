@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -11,7 +13,8 @@ import org.firstinspires.ftc.teamcode.Robot.CustomMath.PDFL;
 
 import java.util.List;
 
-
+@TeleOp
+@Config
 public class teleOp extends LinearOpMode {
     private List<LynxModule> allHubs;
     private DcMotor FRM,BRM,FLM,BLM,armRotate,viper;
@@ -19,15 +22,19 @@ public class teleOp extends LinearOpMode {
     private Servo intakeWrist;
     private CRServo intake;
     private double lf_power, lb_power, rf_power, rb_power;
+    public static double tunePos = 0;
     private enum rotatePos{
         ZERO,
         NEUTRAL,
         BASKET,
         BAR,
-        HANG
+        BARDOWN,
+        HANG,
+        HANGDOWN
+
     }
-    private double zeroAngle = 0, neutralAngle = 45,basketAngle = 130, barAngle = 90, HangAngle = 130, wristLeft = 0, wristCenter = .5, wristRight = 1;
-    private rotatePos rotatePosition = rotatePos.NEUTRAL, targetRotatePosition = rotatePos.NEUTRAL;
+    private double zeroAngle = 0, neutralAngle = 25, intakeSample  = 41,basketAngle = 150, barAngle = 150, barDownAngle = 155, HangAngle = 125, HANGDOWN = 360, wristLeft = .35, wristCenter = .67, wristRight = 1;
+    private rotatePos rotatePosition = rotatePos.ZERO, targetRotatePosition = rotatePos.ZERO;
     @Override
     public void runOpMode() throws InterruptedException {
         allHubs = hardwareMap.getAll(LynxModule.class);
@@ -38,17 +45,18 @@ public class teleOp extends LinearOpMode {
         BRM = hardwareMap.get(DcMotor.class, "BRM");
         FLM = hardwareMap.get(DcMotor.class,"FLM");
         BLM = hardwareMap.get(DcMotor.class,"BLM");
-        FLM.setDirection(DcMotorSimple.Direction.REVERSE);
-        BLM.setDirection(DcMotorSimple.Direction.REVERSE);
+        FRM.setDirection(DcMotorSimple.Direction.REVERSE);
+        BRM.setDirection(DcMotorSimple.Direction.REVERSE);
         FRM.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BRM.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         FLM.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BLM.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armRotate = hardwareMap.get(DcMotor.class,"armRotate");
+        armRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rotate = new viperRotate(armRotate);
 
-        intakeWrist = hardwareMap.get(Servo.class, "intakeWrist");
-        intake = hardwareMap.get(CRServo.class, "intake");
+        intakeWrist = hardwareMap.get(Servo.class, "intakeWrist"); //port 1 control hub//
+        intake = hardwareMap.get(CRServo.class, "intake"); //port 0 control hub//
 
 
         waitForStart();
@@ -72,19 +80,27 @@ public class teleOp extends LinearOpMode {
             }
 
             if(gamepad2.b || gamepad1.b){
-                targetRotatePosition = rotatePos.NEUTRAL;
+                rotate.setTargetAngle(neutralAngle);
                 intakeWrist.setPosition(wristCenter);
             } else if (gamepad2.a) {
-                targetRotatePosition = rotatePos.BASKET;
-            } else if (gamepad2.x) {
-                targetRotatePosition =rotatePos.BAR;
+                rotate.setTargetAngle(basketAngle);
+                intakeWrist.setPosition(wristCenter);
+            } else if (gamepad2.left_bumper) {
+                rotate.setTargetAngle(barAngle);
+                intakeWrist.setPosition(wristRight);
+            } else if (gamepad2.right_bumper) {
+                rotate.setTargetAngle(barDownAngle);
             } else if (gamepad2.y) {
-                targetRotatePosition = rotatePos.ZERO;
-            } else if (gamepad1.a) {
-                targetRotatePosition = rotatePos.HANG;
+                rotate.setTargetAngle(HANGDOWN);
+                intakeWrist.setPosition(wristCenter);
+            } else if (gamepad2.x) {
+                rotate.setTargetAngle(HangAngle);
+                intakeWrist.setPosition(wristCenter);
+            } else if (gamepad2.dpad_down) {
+                rotate.setTargetAngle(zeroAngle);
+                intakeWrist.setPosition(wristCenter);
             }
             update();
-
             for (LynxModule hub : allHubs) {
                 hub.clearBulkCache();
             }
@@ -116,76 +132,15 @@ public class teleOp extends LinearOpMode {
         }
 
     }
-
+    private void tuneViper(){
+        rotate.setTargetAngle(tunePos);
+        rotate.periodic();
+    }
     private void update(){
         FLM.setPower(lf_power);
         BLM.setPower(lb_power);
         FRM.setPower(rf_power);
         BRM.setPower(rb_power);
-        switch (rotatePosition){
-            case ZERO:
-                if(targetRotatePosition != rotatePos.ZERO){
-                    rotate.setTargetAngle(neutralAngle);
-                    if (rotate.getAngle() == neutralAngle){
-                        rotatePosition = rotatePos.NEUTRAL;
-                    }
-                }
-                break;
-            case NEUTRAL:
-                switch (targetRotatePosition){
-                    case HANG:
-                        rotate.setTargetAngle(HangAngle);
-                        if (rotate.getAngle() == HangAngle){
-                            rotatePosition = rotatePos.HANG;
-                        }
-                        break;
-                    case BASKET:
-                        rotate.setTargetAngle(basketAngle);
-                        if (rotate.getAngle() == basketAngle){
-                            rotatePosition = rotatePos.BASKET;
-                        }
-                        break;
-                    case ZERO:
-                        rotate.setTargetAngle(zeroAngle);
-                        if (rotate.getAngle() == zeroAngle){
-                            rotatePosition = rotatePos.ZERO;
-                        }
-                        break;
-                    case BAR:
-                        rotate.setTargetAngle(barAngle);
-                        if (rotate.getAngle() == barAngle){
-                            rotatePosition = rotatePos.BAR;
-                        }
-                        break;
-                    case NEUTRAL:
-                        break;
-                }
-                break;
-            case BASKET:
-                if(targetRotatePosition != rotatePos.BASKET){
-                    rotate.setTargetAngle(neutralAngle);
-                    if (rotate.getAngle() == neutralAngle){
-                        rotatePosition = rotatePos.NEUTRAL;
-                    }
-                }
-                break;
-            case BAR:
-                if(targetRotatePosition != rotatePos.BAR){
-                    rotate.setTargetAngle(neutralAngle);
-                    if (rotate.getAngle() == neutralAngle){
-                        rotatePosition = rotatePos.NEUTRAL;
-                    }
-                }
-                break;
-            case HANG:
-                if(targetRotatePosition != rotatePos.HANG){
-                    rotate.setTargetAngle(neutralAngle);
-                    if (rotate.getAngle() == neutralAngle){
-                        rotatePosition = rotatePos.NEUTRAL;
-                    }
-                }
-                break;
-        }
 
 
         rotate.periodic();

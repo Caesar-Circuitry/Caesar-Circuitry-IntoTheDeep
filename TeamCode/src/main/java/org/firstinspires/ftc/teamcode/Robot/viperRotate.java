@@ -11,11 +11,11 @@ public class viperRotate {
     private DcMotor rotate;
     private RotatingArmController PDFLController;
     public static double
-            kP = 0.01,//the value that actually corrects error
+            kP = 0.03,//the value that actually corrects error
             kD = 0, //dampens the aggressiveness of P
             kI = 0; // adjusts for always error
     private double TargetAngle = 0, CurrentAngle = 0, Error = 0, EncoderCount = 0, rotatePow = 0, rotatePowPrev= 0;
-    private double ticksPer90 = 1438, ticksPerDegree = ticksPer90/90;
+    private double ticksPer90 = -1498, ticksPerDegree = ticksPer90/90;
 
     public viperRotate(DcMotor rotate){
         this.rotate = rotate;
