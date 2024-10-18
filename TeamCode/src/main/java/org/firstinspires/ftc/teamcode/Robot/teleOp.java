@@ -33,8 +33,9 @@ public class teleOp extends LinearOpMode {
         HANGDOWN
 
     }
-    private double zeroAngle = 0, neutralAngle = 25, intakeSample  = 41,basketAngle = 150, barAngle = 150, barDownAngle = 155, HangAngle = 125, HANGDOWN = 360, wristLeft = .35, wristCenter = .67, wristRight = 1;
+    private double zeroAngle = 230, neutralAngle = 25, intakeSample  = 255,basketAngle = 150, barAngle = 150, barDownAngle = 155, HangAngle = 125, HANGDOWN = 360, wristLeft = .35, wristCenter = .67, wristRight = 1, multiplier =1;
     private rotatePos rotatePosition = rotatePos.ZERO, targetRotatePosition = rotatePos.ZERO;
+    private boolean tog = false;
     @Override
     public void runOpMode() throws InterruptedException {
         allHubs = hardwareMap.getAll(LynxModule.class);
@@ -64,9 +65,9 @@ public class teleOp extends LinearOpMode {
         while (opModeIsActive()){
             drive();
             if (gamepad1.right_trigger>0 || gamepad2.right_trigger>0){
-                intake.setPower(1);
-            } else if (gamepad1.left_trigger>0 || gamepad2.left_trigger>0) {
                 intake.setPower(-1);
+            } else if (gamepad1.left_trigger>0 || gamepad2.left_trigger>0) {
+                intake.setPower(1);
             }else{
                 intake.setPower(0);
             }
@@ -75,11 +76,11 @@ public class teleOp extends LinearOpMode {
                 intakeWrist.setPosition(wristLeft);
             } else if (gamepad1.dpad_up || gamepad2.dpad_up) {
                 intakeWrist.setPosition(wristCenter);
-            } else if (gamepad1.dpad_right || gamepad2.dpad_up) {
+            } else if (gamepad1.dpad_right || gamepad2.dpad_right) {
                 intakeWrist.setPosition(wristRight);
             }
 
-            if(gamepad2.b || gamepad1.b){
+            if(gamepad1.b){
                 rotate.setTargetAngle(neutralAngle);
                 intakeWrist.setPosition(wristCenter);
             } else if (gamepad2.a) {
@@ -87,7 +88,7 @@ public class teleOp extends LinearOpMode {
                 intakeWrist.setPosition(wristCenter);
             } else if (gamepad2.left_bumper) {
                 rotate.setTargetAngle(barAngle);
-                intakeWrist.setPosition(wristRight);
+                intakeWrist.setPosition(wristLeft);
             } else if (gamepad2.right_bumper) {
                 rotate.setTargetAngle(barDownAngle);
             } else if (gamepad2.y) {
@@ -99,6 +100,14 @@ public class teleOp extends LinearOpMode {
             } else if (gamepad2.dpad_down) {
                 rotate.setTargetAngle(zeroAngle);
                 intakeWrist.setPosition(wristCenter);
+            } else if (gamepad2.b) {
+                rotate.setTargetAngle(intakeSample);
+                intakeWrist.setPosition(wristCenter);
+            }
+            if(gamepad1.left_bumper){
+                multiplier = .2;
+            }else{
+                multiplier = 1;
             }
             update();
             for (LynxModule hub : allHubs) {
@@ -108,9 +117,9 @@ public class teleOp extends LinearOpMode {
 
     }
     private void drive(){
-        double x = -gamepad1.left_stick_x;
-        double y = gamepad1.left_stick_y;
-        double turn = -gamepad1.right_stick_x;
+        double x = -gamepad1.left_stick_x * multiplier;
+        double y = gamepad1.left_stick_y * multiplier;
+        double turn = -gamepad1.right_stick_x/1.2;
 
         double theta = Math.atan2(y,x);
         double power = Math.hypot(x,y);
