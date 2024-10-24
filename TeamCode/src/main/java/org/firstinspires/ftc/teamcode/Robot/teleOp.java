@@ -17,7 +17,7 @@ import java.util.List;
 @Config
 public class teleOp extends LinearOpMode {
     private List<LynxModule> allHubs;
-    private DcMotor FRM,BRM,FLM,BLM,armRotate,viper;
+    private DcMotor FRM,BRM,FLM,BLM,armRotate;
     private viperRotate rotate;
     private Servo intakeWrist;
     private CRServo intake;
@@ -33,7 +33,7 @@ public class teleOp extends LinearOpMode {
         HANGDOWN
 
     }
-    private double zeroAngle = 230, neutralAngle = 25, intakeSample  = 255,basketAngle = 150, barAngle = 150, barDownAngle = 155, HangAngle = 125, HANGDOWN = 360, wristLeft = .35, wristCenter = .67, wristRight = 1, multiplier =1;
+    private double zeroAngle = 230, neutralAngle = 25, intakeSample  = 255,basketAngle = 150, barAngle = 150, barDownAngle = 158, HangAngle = 125, HANGDOWN = 360, wristLeft = .35, wristCenter = .67, wristRight = 1, multiplier =1;
     private rotatePos rotatePosition = rotatePos.ZERO, targetRotatePosition = rotatePos.ZERO;
     private boolean tog = false;
     @Override
