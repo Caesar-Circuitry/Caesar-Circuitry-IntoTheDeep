@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Robot.CustomMath.PDFL;
+import org.firstinspires.ftc.teamcode.Robot.CustomMath.PID;
 
 import java.util.List;
 
@@ -17,8 +18,9 @@ import java.util.List;
 @Config
 public class teleOp extends LinearOpMode {
     private List<LynxModule> allHubs;
-    private DcMotor FRM,BRM,FLM,BLM,armRotate;
+    private DcMotor FRM,BRM,FLM,BLM,armRotate,viper;
     private viperRotate rotate;
+    private PID Viper;
     private Servo intakeWrist;
     private CRServo intake;
     private double lf_power, lb_power, rf_power, rb_power;
@@ -42,6 +44,8 @@ public class teleOp extends LinearOpMode {
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
+        viper = hardwareMap.get(DcMotor.class, "viper");
+        Viper = new PID(hardwareMap);
         FRM = hardwareMap.get(DcMotor.class, "FRM");
         BRM = hardwareMap.get(DcMotor.class, "BRM");
         FLM = hardwareMap.get(DcMotor.class,"FLM");
@@ -56,63 +60,65 @@ public class teleOp extends LinearOpMode {
         armRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rotate = new viperRotate(armRotate);
 
-        intakeWrist = hardwareMap.get(Servo.class, "intakeWrist"); //port 1 control hub//
-        intake = hardwareMap.get(CRServo.class, "intake"); //port 0 control hub//
+//        intakeWrist = hardwareMap.get(Servo.class, "intakeWrist"); //port 1 control hub//
+//        intake = hardwareMap.get(CRServo.class, "intake"); //port 0 control hub//
 
 
         waitForStart();
 
         while (opModeIsActive()){
-            drive();
-            if (gamepad1.right_trigger>0 || gamepad2.right_trigger>0){
-                intake.setPower(-1);
-            } else if (gamepad1.left_trigger>0 || gamepad2.left_trigger>0) {
-                intake.setPower(1);
-            }else{
-                intake.setPower(0);
-            }
-
-            if(gamepad1.dpad_left || gamepad2.dpad_left){
-                intakeWrist.setPosition(wristLeft);
-            } else if (gamepad1.dpad_up || gamepad2.dpad_up) {
-                intakeWrist.setPosition(wristCenter);
-            } else if (gamepad1.dpad_right || gamepad2.dpad_right) {
-                intakeWrist.setPosition(wristRight);
-            }
-
-            if(gamepad1.b){
-                rotate.setTargetAngle(neutralAngle);
-                intakeWrist.setPosition(wristCenter);
-            } else if (gamepad2.a) {
-                rotate.setTargetAngle(basketAngle);
-                intakeWrist.setPosition(wristCenter);
-            } else if (gamepad2.left_bumper) {
-                rotate.setTargetAngle(barAngle);
-                intakeWrist.setPosition(wristLeft);
-            } else if (gamepad2.right_bumper) {
-                rotate.setTargetAngle(barDownAngle);
-            } else if (gamepad2.y) {
-                rotate.setTargetAngle(HANGDOWN);
-                intakeWrist.setPosition(wristCenter);
-            } else if (gamepad2.x) {
-                rotate.setTargetAngle(HangAngle);
-                intakeWrist.setPosition(wristCenter);
-            } else if (gamepad2.dpad_down) {
-                rotate.setTargetAngle(zeroAngle);
-                intakeWrist.setPosition(wristCenter);
-            } else if (gamepad2.b) {
-                rotate.setTargetAngle(intakeSample);
-                intakeWrist.setPosition(wristCenter);
-            }
-            if(gamepad1.left_bumper){
-                multiplier = .2;
-            }else{
-                multiplier = 1;
-            }
-            update();
-            for (LynxModule hub : allHubs) {
-                hub.clearBulkCache();
-            }
+//            drive();
+//            if (gamepad1.right_trigger>0 || gamepad2.right_trigger>0){
+//                intake.setPower(-1);
+//            } else if (gamepad1.left_trigger>0 || gamepad2.left_trigger>0) {
+//                intake.setPower(1);
+//            }else{
+//                intake.setPower(0);
+//            }
+//
+//            if(gamepad1.dpad_left || gamepad2.dpad_left){
+//                intakeWrist.setPosition(wristLeft);
+//            } else if (gamepad1.dpad_up || gamepad2.dpad_up) {
+//                intakeWrist.setPosition(wristCenter);
+//            } else if (gamepad1.dpad_right || gamepad2.dpad_right) {
+//                intakeWrist.setPosition(wristRight);
+//            }
+//
+//            if(gamepad1.b){
+//                rotate.setTargetAngle(neutralAngle);
+//                intakeWrist.setPosition(wristCenter);
+//            } else if (gamepad2.a) {
+//                rotate.setTargetAngle(basketAngle);
+//                intakeWrist.setPosition(wristCenter);
+//            } else if (gamepad2.left_bumper) {
+//                rotate.setTargetAngle(barAngle);
+//                intakeWrist.setPosition(wristLeft);
+//            } else if (gamepad2.right_bumper) {
+//                rotate.setTargetAngle(barDownAngle);
+//            } else if (gamepad2.y) {
+//                rotate.setTargetAngle(HANGDOWN);
+//                intakeWrist.setPosition(wristCenter);
+//            } else if (gamepad2.x) {
+//                rotate.setTargetAngle(HangAngle);
+//                intakeWrist.setPosition(wristCenter);
+//            } else if (gamepad2.dpad_down) {
+//                rotate.setTargetAngle(zeroAngle);
+//                intakeWrist.setPosition(wristCenter);
+//            } else if (gamepad2.b) {
+//                rotate.setTargetAngle(intakeSample);
+//                intakeWrist.setPosition(wristCenter);
+//            }
+//            if(gamepad1.left_bumper){
+//                multiplier = .2;
+//            }else{
+//                multiplier = 1;
+//            }
+//            update();
+//            for (LynxModule hub : allHubs) {
+//                hub.clearBulkCache();
+//            }
+            Viper.liftRunToPosition(tunePos, 1);
+            Viper.updateConstants();
         }
 
     }

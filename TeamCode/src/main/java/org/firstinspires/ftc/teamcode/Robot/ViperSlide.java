@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.Robot.CustomMath.PDFL;
 public class ViperSlide {
     /*TODO add a bucket apriltag calculate viper Pos function*/
     private DcMotor Slide;
-    private double ticksPerIn = 10.96;
+    private double ticksPerIn = -111.1;
     private PDFL PDFLController;
     public static double kP = 0, kD = 0, kF = 0, kL = 0;
     private double TargetPos = 0, CurrentPos = 0, Error = 0, EncoderPos = 0, slidePow = 0, slidePowPrev = 0;
@@ -38,7 +38,7 @@ public class ViperSlide {
         }
         CurrentPos = EncoderPos;
         Error = TargetPos - CurrentPos;
-        slidePow = PDFLController.run(Error);
+//        slidePow = PDFLController.run(CurrentPos,TargetPos);
         if (slidePow != slidePowPrev) {
             Slide.setPower(slidePow);
             slidePowPrev = slidePow;
