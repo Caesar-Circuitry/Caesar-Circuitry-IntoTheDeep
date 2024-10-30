@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Robot;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.controller.PIDController;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -20,32 +22,35 @@ public class teleOp extends LinearOpMode {
     private List<LynxModule> allHubs;
     private DcMotor FRM,BRM,FLM,BLM,armRotate,viper;
     private viperRotate rotate;
-    private PID Viper;
-    private Servo intakeWrist;
-    private CRServo intake;
     private double lf_power, lb_power, rf_power, rb_power;
-    public static double tunePos = 0;
-    private enum rotatePos{
-        ZERO,
-        NEUTRAL,
-        BASKET,
-        BAR,
-        BARDOWN,
-        HANG,
-        HANGDOWN
+    public static double tunePos = 0, pos_in = 0;
+    private static final double LIFT_TICKS_PER_IN = -104.7; // Example value, adjust based on your motor and gearing
+    private DcMotor liftMotor;
+    private Motor.Encoder liftEncoder;
+    private Servo clawWrist,claw;
+    private double liftTargetPos_ticks;
+    private double liftLastPos_ticks = 0;
+    private double liftPower = 0;
+    private double prevLiftPower = 0;
+    public static double kp = 0.01,ki = 0,kd = 0;
+    private PIDController liftController; // Assume you have a PIDController class implemented
 
-    }
-    private double zeroAngle = 230, neutralAngle = 25, intakeSample  = 255,basketAngle = 150, barAngle = 150, barDownAngle = 158, HangAngle = 125, HANGDOWN = 360, wristLeft = .35, wristCenter = .67, wristRight = 1, multiplier =1;
-    private rotatePos rotatePosition = rotatePos.ZERO, targetRotatePosition = rotatePos.ZERO;
-    private boolean tog = false;
+    public static double zeroAngle = 230, neutralAngle = 25, floorAngle = 13, intakeSample  = 255, intakeSpecimen = 45,basketAngle = 125, HangAngle = 150, barDownAngle = 158,
+    BarUpAngle = 90, HANGDOWN = 360, clawOpen =.9, clawClosed = .62, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = .5, clawWristFloor= .05, multiplier =1,
+    viperbasket = 17, viperZero = 0, viperBar = 6;
     @Override
     public void runOpMode() throws InterruptedException {
         allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
+        liftMotor = hardwareMap.get(DcMotor.class, "viper");
+        liftEncoder = new Motor(hardwareMap, "viper", Motor.GoBILDA.RPM_312).encoder;
+        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        liftController = new PIDController(kp, ki, kd); // Example PID constants, adjust as needed
+        liftEncoder.reset();
         viper = hardwareMap.get(DcMotor.class, "viper");
-        Viper = new PID(hardwareMap);
         FRM = hardwareMap.get(DcMotor.class, "FRM");
         BRM = hardwareMap.get(DcMotor.class, "BRM");
         FLM = hardwareMap.get(DcMotor.class,"FLM");
@@ -60,65 +65,66 @@ public class teleOp extends LinearOpMode {
         armRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rotate = new viperRotate(armRotate);
 
-//        intakeWrist = hardwareMap.get(Servo.class, "intakeWrist"); //port 1 control hub//
-//        intake = hardwareMap.get(CRServo.class, "intake"); //port 0 control hub//
+        clawWrist = hardwareMap.get(Servo.class, "clawWrist"); //port 1 control hub//
+        claw = hardwareMap.get(Servo.class, "claw"); //port 0 control hub//
 
 
         waitForStart();
 
         while (opModeIsActive()){
-//            drive();
-//            if (gamepad1.right_trigger>0 || gamepad2.right_trigger>0){
-//                intake.setPower(-1);
-//            } else if (gamepad1.left_trigger>0 || gamepad2.left_trigger>0) {
-//                intake.setPower(1);
-//            }else{
-//                intake.setPower(0);
-//            }
-//
-//            if(gamepad1.dpad_left || gamepad2.dpad_left){
-//                intakeWrist.setPosition(wristLeft);
-//            } else if (gamepad1.dpad_up || gamepad2.dpad_up) {
-//                intakeWrist.setPosition(wristCenter);
-//            } else if (gamepad1.dpad_right || gamepad2.dpad_right) {
-//                intakeWrist.setPosition(wristRight);
-//            }
-//
-//            if(gamepad1.b){
-//                rotate.setTargetAngle(neutralAngle);
-//                intakeWrist.setPosition(wristCenter);
-//            } else if (gamepad2.a) {
-//                rotate.setTargetAngle(basketAngle);
-//                intakeWrist.setPosition(wristCenter);
-//            } else if (gamepad2.left_bumper) {
-//                rotate.setTargetAngle(barAngle);
-//                intakeWrist.setPosition(wristLeft);
-//            } else if (gamepad2.right_bumper) {
-//                rotate.setTargetAngle(barDownAngle);
-//            } else if (gamepad2.y) {
-//                rotate.setTargetAngle(HANGDOWN);
-//                intakeWrist.setPosition(wristCenter);
-//            } else if (gamepad2.x) {
-//                rotate.setTargetAngle(HangAngle);
-//                intakeWrist.setPosition(wristCenter);
-//            } else if (gamepad2.dpad_down) {
-//                rotate.setTargetAngle(zeroAngle);
-//                intakeWrist.setPosition(wristCenter);
-//            } else if (gamepad2.b) {
-//                rotate.setTargetAngle(intakeSample);
-//                intakeWrist.setPosition(wristCenter);
-//            }
-//            if(gamepad1.left_bumper){
-//                multiplier = .2;
-//            }else{
-//                multiplier = 1;
-//            }
-//            update();
-//            for (LynxModule hub : allHubs) {
-//                hub.clearBulkCache();
-//            }
-            Viper.liftRunToPosition(tunePos, 1);
-            Viper.updateConstants();
+            drive();
+            if (gamepad1.right_trigger>0 || gamepad2.right_trigger>0){
+                claw.setPosition(clawClosed);
+            } else if (gamepad1.left_trigger>0 || gamepad2.left_trigger>0) {
+                claw.setPosition(clawOpen);
+            }
+
+            if(gamepad1.dpad_left || gamepad2.dpad_left){
+                clawWrist.setPosition(clawWristBucket);
+            } else if (gamepad1.dpad_right || gamepad2.dpad_right) {
+                clawWrist.setPosition(clawWristPickup);
+            }else if (gamepad2.dpad_up) {
+                clawWrist.setPosition(clawWristSpecimen);
+            }
+
+            if(gamepad1.b || gamepad2.b){
+                pos_in = viperZero;
+                rotate.setTargetAngle(neutralAngle);
+                clawWrist.setPosition(clawWristPickup);
+            } else if (gamepad2.a) {
+                pos_in = viperbasket;
+                rotate.setTargetAngle(basketAngle);
+                clawWrist.setPosition(clawWristBucket);
+            } else if (gamepad2.left_bumper) {
+                clawWrist.setPosition(clawWristFloor);
+                pos_in = viperZero;
+                rotate.setTargetAngle(floorAngle);
+            } else if (gamepad2.right_bumper) {
+                pos_in = viperZero;
+                rotate.setTargetAngle(intakeSpecimen);
+                clawWrist.setPosition(clawWristSpecimen);
+            } else if (gamepad2.y) {
+                pos_in = viperZero;
+                rotate.setTargetAngle(BarUpAngle);
+                clawWrist.setPosition(clawWristPickup);
+            } else if (gamepad2.x) {
+                pos_in = viperBar;
+                rotate.setTargetAngle(BarUpAngle);
+                clawWrist.setPosition(clawWristPickup);
+            } else if (gamepad2.dpad_down) {
+                rotate.setTargetAngle(zeroAngle);
+                clawWrist.setPosition(clawWristBucket);
+            }
+            if(gamepad1.left_bumper){
+                multiplier = .2;
+            }else{
+                multiplier = 1;
+            }
+            update();
+            liftRunToPosition(1);
+            for (LynxModule hub : allHubs) {
+                hub.clearBulkCache();
+            }
         }
 
     }
@@ -147,9 +153,17 @@ public class teleOp extends LinearOpMode {
         }
 
     }
-    private void tuneViper(){
-        rotate.setTargetAngle(tunePos);
-        rotate.periodic();
+    public void liftRunToPosition(double speed_0to1) {
+        liftTargetPos_ticks = pos_in * LIFT_TICKS_PER_IN;
+        liftPower = liftController.calculate(liftLastPos_ticks, liftTargetPos_ticks) * speed_0to1;
+
+        liftLastPos_ticks = liftEncoder.getPosition();
+
+        if (liftPower != prevLiftPower) {
+            liftMotor.setPower(liftPower);
+        }
+
+        prevLiftPower = liftPower;
     }
     private void update(){
         FLM.setPower(lf_power);
