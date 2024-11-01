@@ -17,7 +17,7 @@ public class demoBot extends LinearOpMode {
         BRM = hardwareMap.get(DcMotor.class, "BRM");
         FLM = hardwareMap.get(DcMotor.class,"FLM");
         BLM = hardwareMap.get(DcMotor.class,"BLM");
-        FLM.setDirection(DcMotorSimple.Direction.REVERSE);
+        FLM.setDirection(DcMotorSimple.Direction.REVERSE); //probaly need to adjust depending on omnis
         BLM.setDirection(DcMotorSimple.Direction.REVERSE);
         waitForStart();
         while (opModeIsActive()){
@@ -25,28 +25,26 @@ public class demoBot extends LinearOpMode {
         }
     }
     private void drive(){
-        double x = -gamepad1.left_stick_x * multiplier;
-        double y = gamepad1.left_stick_y * multiplier;
-        double turn = gamepad1.right_stick_x/1.2 * multiplier;
+        double Power = gamepad1.left_stick_y * multiplier;  // Forward and backward movement
 
-        double theta = Math.atan2(y,x);
-        double power = Math.hypot(x,y);
+// Optional: If you want to add turning capability using the right stick
+        double turn = gamepad1.right_stick_x * multiplier; // Turning left and right
 
-        double sin = Math.sin(theta -Math.PI/4);
-        double cos = Math.cos(theta -Math.PI/4);
-        double max = Math.max(Math.abs(sin), Math.abs(cos));
+// Combine the driving and turning for left and right motors
+        double lf_power = Power + turn; // Left front power
+        double lb_power = Power + turn; // Left back power
+        double rf_power = Power - turn; // Right front power
+        double rb_power = Power - turn; // Right back power
 
-        double lf_power = power * cos/max + turn;
-        double lb_power = power * sin/max + turn;
-        double rf_power = power * sin/max - turn;
-        double rb_power = power * cos/max - turn;
-
-        if((power + Math.abs(turn)) > 1) {
-            lf_power /= power + turn;
-            lb_power /= power + turn;
-            rf_power /= power + turn;
-            rb_power /= power + turn;
+// Normalize the power values if they exceed 1
+        double maxPower = Math.max(Math.abs(lf_power), Math.max(Math.abs(lb_power), Math.max(Math.abs(rf_power), Math.abs(rb_power))));
+        if (maxPower > 1) {
+            lf_power /= maxPower;
+            lb_power /= maxPower;
+            rf_power /= maxPower;
+            rb_power /= maxPower;
         }
+
         FLM.setPower(lf_power);
         BLM.setPower(lb_power);
         FRM.setPower(rf_power);

@@ -10,11 +10,14 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Robot.CustomMath.PDFL;
 import org.firstinspires.ftc.teamcode.Robot.CustomMath.PID;
 
 import java.util.List;
+import java.util.Timer;
 
 @TeleOp
 @Config
@@ -34,12 +37,27 @@ public class teleOp extends LinearOpMode {
     private double prevLiftPower = 0;
     public static double kp = 0.01,ki = 0,kd = 0;
     private PIDController liftController; // Assume you have a PIDController class implemented
+    private ElapsedTime time;
+    private enum Pos{
+        ZERO,
+        NEUTRAL,
+        FLOOR,
+        INT_SAMPLE,
+        INT_SPECIMEN,
+        BASKET_ANGLE,
+        HANG_ANGLE,
+        BAR_ANGLE
+    }
+    private Pos targetPos = Pos.ZERO;
+    private Pos actualPos = Pos.ZERO;
 
-    public static double zeroAngle = 230, neutralAngle = 25, floorAngle = 13, intakeSample  = 255, intakeSpecimen = 45,basketAngle = 125, HangAngle = 150, barDownAngle = 158,
-    BarUpAngle = 90, HANGDOWN = 360, clawOpen =.9, clawClosed = .62, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = .5, clawWristFloor= .05, multiplier =1,
+    public static double neutralAngle = 25, floorAngle = 13, intakeSample  = 255, intakeSpecimen = 45,basketAngle = 125, HangAngle = 150, BarUpAngle = 90, HANGDOWNANGLE = 360,
+            clawOpen =.9, clawClosed = .62, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = .5, clawWristFloor= .05, multiplier =1,
     viperbasket = 17, viperZero = 0, viperBar = 6;
+    private boolean firstTime = true, dirState = true; //dirState true up false down
     @Override
     public void runOpMode() throws InterruptedException {
+        time = new ElapsedTime();
         allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -67,59 +85,37 @@ public class teleOp extends LinearOpMode {
 
         clawWrist = hardwareMap.get(Servo.class, "clawWrist"); //port 1 control hub//
         claw = hardwareMap.get(Servo.class, "claw"); //port 0 control hub//
-
-
+        time.reset();
         waitForStart();
 
         while (opModeIsActive()){
             drive();
-            if (gamepad1.right_trigger>0 || gamepad2.right_trigger>0){
-                claw.setPosition(clawClosed);
-            } else if (gamepad1.left_trigger>0 || gamepad2.left_trigger>0) {
-                claw.setPosition(clawOpen);
-            }
-
-            if(gamepad1.dpad_left || gamepad2.dpad_left){
-                clawWrist.setPosition(clawWristBucket);
-            } else if (gamepad1.dpad_right || gamepad2.dpad_right) {
-                clawWrist.setPosition(clawWristPickup);
-            }else if (gamepad2.dpad_up) {
-                clawWrist.setPosition(clawWristSpecimen);
-            }
-
-            if(gamepad1.b || gamepad2.b){
-                pos_in = viperZero;
-                rotate.setTargetAngle(neutralAngle);
-                clawWrist.setPosition(clawWristPickup);
-            } else if (gamepad2.a) {
-                pos_in = viperbasket;
-                rotate.setTargetAngle(basketAngle);
-                clawWrist.setPosition(clawWristBucket);
-            } else if (gamepad2.left_bumper) {
-                clawWrist.setPosition(clawWristFloor);
-                pos_in = viperZero;
-                rotate.setTargetAngle(floorAngle);
-            } else if (gamepad2.right_bumper) {
-                pos_in = viperZero;
-                rotate.setTargetAngle(intakeSpecimen);
-                clawWrist.setPosition(clawWristSpecimen);
-            } else if (gamepad2.y) {
-                pos_in = viperZero;
-                rotate.setTargetAngle(BarUpAngle);
-                clawWrist.setPosition(clawWristPickup);
-            } else if (gamepad2.x) {
-                pos_in = viperBar;
-                rotate.setTargetAngle(BarUpAngle);
-                clawWrist.setPosition(clawWristPickup);
-            } else if (gamepad2.dpad_down) {
-                rotate.setTargetAngle(zeroAngle);
-                clawWrist.setPosition(clawWristBucket);
-            }
-            if(gamepad1.left_bumper){
-                multiplier = .2;
-            }else{
-                multiplier = 1;
-            }
+           if(gamepad2.a){
+               targetPos = Pos.BASKET_ANGLE;
+               firstTime = true;
+           } else if (gamepad2.x) {
+               targetPos = Pos.BAR_ANGLE;
+               firstTime = true;
+           } else if (gamepad2.y) {
+               pos_in = 0;
+           } else if (gamepad2.b && gamepad1.b) {
+               targetPos = Pos.NEUTRAL;
+               firstTime = true;
+           } else if (gamepad2.right_bumper) {
+               pos_in+=1;
+           } else if (gamepad2.left_bumper) {
+               pos_in-=1;
+           } else if (gamepad2.dpad_up) {
+               targetPos = Pos.INT_SPECIMEN;
+               firstTime = true;
+           }else if (gamepad2.dpad_down){
+               targetPos = Pos.INT_SAMPLE;
+               firstTime = true;
+           }
+            telemetry.addData("target pos", targetPos);
+            telemetry.addData("actual pos", actualPos);
+            telemetry.addData("viper pos", liftLastPos_ticks * LIFT_TICKS_PER_IN);
+            states();
             update();
             liftRunToPosition(1);
             for (LynxModule hub : allHubs) {
@@ -173,5 +169,133 @@ public class teleOp extends LinearOpMode {
 
 
         rotate.periodic();
+    }
+
+//    boolean firstTime = true;
+//    dirState = //Can be up or down
+
+    private void states(){
+        switch (targetPos){
+
+//            case NEUTRAL:
+//                if (firstTime == true){
+//
+//                    firstTime = false;
+//                    if (viper slide needs to go){
+//                        dirState = up;
+//                    }
+//                    else{
+//                        dirState = down;
+//                    }
+//                }
+//
+//                if (dirState = up){
+//                    //Set ViperSlide
+//                    if (viper slide has reached final postion)
+//                    {
+//                        //Set Angle
+//                    }
+//                }
+//                else (dirState = down) {
+//                    //Set Angle
+//                    if(angle has reached final postion){
+//                     //Set Viper Slide
+//                    }
+//                }
+//            }
+
+            case NEUTRAL:
+                if (firstTime){
+                    firstTime = false;
+                    if(liftLastPos_ticks * LIFT_TICKS_PER_IN <= viperZero) {
+                        dirState = true;
+                    }
+                    else{
+                        dirState = false;
+                    }
+                }
+                dirCode(neutralAngle, viperZero);
+                break;
+            case FLOOR:
+                if (firstTime){
+                    firstTime = false;
+                    if(liftLastPos_ticks * LIFT_TICKS_PER_IN <= viperZero) {
+                        dirState = true;
+                    }
+                    else{
+                        dirState = false;
+                    }
+                }
+                dirCode(floorAngle, viperZero);
+                break;
+            case HANG_ANGLE:
+                if (actualPos != targetPos){
+                    pos_in =viperZero;
+                    clawWrist.setPosition(clawWristBucket);
+
+                }
+                break;
+            case INT_SAMPLE:
+                if (firstTime){
+                    firstTime = false;
+                    if(liftLastPos_ticks * LIFT_TICKS_PER_IN <= viperZero) {
+                        dirState = true;
+                    }
+                    else{
+                        dirState = false;
+                    }
+                }
+                dirCode(intakeSample, viperZero);
+                break;
+            case BAR_ANGLE:
+                if (firstTime){
+                    firstTime = false;
+                    if(liftLastPos_ticks * LIFT_TICKS_PER_IN <= viperZero) {
+                        dirState = true;
+                    }
+                    else{
+                        dirState = false;
+                    }
+                }
+                dirCode(BarUpAngle, viperBar);
+                break;
+            case BASKET_ANGLE:
+                if (firstTime){
+                    firstTime = false;
+                    if(liftLastPos_ticks * LIFT_TICKS_PER_IN <= viperZero) {
+                        dirState = true;
+                    }
+                    else{
+                        dirState = false;
+                    }
+                }
+                dirCode(basketAngle, viperbasket);
+                break;
+            case INT_SPECIMEN:
+                if (firstTime){
+                    firstTime = false;
+                    if(liftLastPos_ticks * LIFT_TICKS_PER_IN <= viperZero) {
+                        dirState = true;
+                    }
+                    else{
+                        dirState = false;
+                    }
+                }
+                dirCode(intakeSpecimen, viperZero);
+                break;
+        }
+    }
+    private void dirCode(double rotPos, double viperPos){
+        if(!dirState){//down
+            pos_in = viperPos;
+            if(liftLastPos_ticks * LIFT_TICKS_PER_IN == viperPos){
+                rotate.setTargetAngle(rotPos);
+            }
+        }else{//up
+            rotate.setTargetAngle(rotPos);
+            if (rotate.getAngle() == rotPos){
+                pos_in = viperPos;
+            }
+        }
     }
 }
