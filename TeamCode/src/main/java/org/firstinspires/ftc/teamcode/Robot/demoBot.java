@@ -17,8 +17,8 @@ public class demoBot extends LinearOpMode {
         BRM = hardwareMap.get(DcMotor.class, "BRM");
         FLM = hardwareMap.get(DcMotor.class,"FLM");
         BLM = hardwareMap.get(DcMotor.class,"BLM");
-        FLM.setDirection(DcMotorSimple.Direction.REVERSE); //probaly need to adjust depending on omnis
-        BLM.setDirection(DcMotorSimple.Direction.REVERSE);
+        FRM.setDirection(DcMotorSimple.Direction.REVERSE); //probaly need to adjust depending on omnis
+        BRM.setDirection(DcMotorSimple.Direction.REVERSE);
         waitForStart();
         while (opModeIsActive()){
             drive();
@@ -28,7 +28,7 @@ public class demoBot extends LinearOpMode {
         double Power = gamepad1.left_stick_y * multiplier;  // Forward and backward movement
 
 // Optional: If you want to add turning capability using the right stick
-        double turn = gamepad1.right_stick_x * multiplier; // Turning left and right
+        double turn = -gamepad1.right_stick_x * multiplier; // Turning left and right
 
 // Combine the driving and turning for left and right motors
         double lf_power = Power + turn; // Left front power

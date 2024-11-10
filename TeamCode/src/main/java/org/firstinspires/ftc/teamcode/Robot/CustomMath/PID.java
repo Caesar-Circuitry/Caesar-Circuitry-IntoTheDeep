@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
 public class PID {
-    private static final double LIFT_TICKS_PER_IN = 111.1; // Example value, adjust based on your motor and gearing
+    private static final double LIFT_TICKS_PER_IN = 125.5; // Example value, adjust based on your motor and gearing
     private DcMotor liftMotor;
     private Motor.Encoder liftEncoder;
     private double liftTargetPos_ticks;
