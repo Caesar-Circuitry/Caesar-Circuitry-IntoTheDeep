@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.RoadRunner.MecanumDrive;
 
 @Config
-@Autonomous(name = "red_Clip", group = "Autonomous")
+@Autonomous(name = "Clip_Auto", group = "Autonomous")
 public class autoRed extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
@@ -134,9 +134,9 @@ public class autoRed extends LinearOpMode {
 
         secondClipToWall = drive.actionBuilder(new Pose2d(6,-40,Math.toRadians(90)))
                 .setReversed(true)
-                .splineToLinearHeading(new Pose2d(52,-55,Math.toRadians(0)),Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(56,-56,Math.toRadians(0)),Math.toRadians(-90))
                 .waitSeconds(1)
-                .strafeTo(new Vector2d(60,-55))
+                .strafeTo(new Vector2d(64,-56))
                 .build();
         secondClipToChamber = drive.actionBuilder(new Pose2d(60,-55,Math.toRadians(0)))
                 .setReversed(true)
@@ -167,7 +167,8 @@ public class autoRed extends LinearOpMode {
                                 actions.barDown(),
                                 shortestWait,
                                 actions.clawOpen(),
-                                backAway,
+                                backAway, 
+                                actions.clawClose(),
                                 actions.intake(),
                                 traverse2OverrideWait,
                                 actions.hold(),

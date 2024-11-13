@@ -20,16 +20,33 @@ public class MeepMeepTesting {
                     .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                     .build();
 
-            myFirstBot.runAction(myFirstBot.getDrive().actionBuilder(new Pose2d(6, -40, Math.toRadians(90)))
+            myFirstBot.runAction(myFirstBot.getDrive().actionBuilder(new Pose2d(28, -64, Math.toRadians(90)))
+                    .splineToConstantHeading(new Vector2d(6,-48),Math.toRadians(90))
+                    .strafeTo(new Vector2d(6,-31.25))
+                    .strafeTo(new Vector2d(6,-48))
                     .setReversed(true)
-                            .splineToLinearHeading(new Pose2d(52,-55,Math.toRadians(0)),Math.toRadians(-90))
-                            .waitSeconds(1)
-                            .setReversed(true)
-                    .splineToSplineHeading(new Pose2d(6,-40,Math.toRadians(90)),Math.toRadians(0))
-
+                    .splineToLinearHeading(new Pose2d(52,-55,Math.toRadians(0)),Math.toRadians(-90))
+                    .waitSeconds(1)
+                    .strafeTo(new Vector2d(60,-55))
+                    .setReversed(true)
+                    .splineToSplineHeading(new Pose2d(6,-48,Math.toRadians(90)),Math.toRadians(0))
+                    .strafeTo(new Vector2d(1,-31.5))
+                    .strafeTo(new Vector2d(6,-48))
+                    .setReversed(true)
+                    .splineToConstantHeading(new Vector2d(38,-35),Math.toRadians(90))
+                    .splineToConstantHeading(new Vector2d(38,-14),Math.toRadians(90))
+                    .waitSeconds(.01)
+                    //first sample
+                    .splineToConstantHeading(new Vector2d(49, -10), Math.toRadians(-90))
+                    .splineToConstantHeading(new Vector2d(49,-52), Math.toRadians(-90))
+                    .waitSeconds(.01)
+                    //second sample
+                    .splineToConstantHeading(new Vector2d(55, -10), Math.toRadians(90))
+                    .splineToConstantHeading(new Vector2d(58,-10), Math.toRadians(-90))
+                    .splineToConstantHeading(new Vector2d(58, -55), Math.toRadians(-90))
                     .build());
 
-            meepMeep.setBackground(MeepMeep.Background.FIELD_INTO_THE_DEEP_OFFICIAL)
+            meepMeep.setBackground(MeepMeep.Background.FIELD_INTO_THE_DEEP_JUICE_LIGHT)
                     .setDarkMode(true)
                     .setBackgroundAlpha(0.95f)
                     // Add both of our declared bot entities
