@@ -41,6 +41,7 @@ public class teleOp extends LinearOpMode {
     public static double kp = 0.01,ki = 0,kd = 0;
     private PIDController liftController; // Assume you have a PIDController class implemented
     private ElapsedTime time, servoTimer;
+    public static double viperUnStuck = 7;
     private enum Pos{
         ZERO,
         NEUTRAL,
@@ -142,6 +143,10 @@ public class teleOp extends LinearOpMode {
                claw.setPosition(clawOpen);
            } else if (gamepad2.right_trigger > 0) {
                claw.setPosition(clawClosed);
+           }
+
+           if (gamepad1.right_bumper){
+               viperBar = viperUnStuck;
            }
 
             if (!gamepad2.right_bumper) {

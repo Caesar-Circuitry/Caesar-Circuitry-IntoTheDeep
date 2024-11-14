@@ -172,6 +172,7 @@ public class autoRed extends LinearOpMode {
                                 actions.intake(),
                                 traverse2OverrideWait,
                                 actions.hold(),
+                                actions.wristIntake(),
                                 //place second specimen
                                 actions.clawOpen(),
                                 secondClipToWall,
