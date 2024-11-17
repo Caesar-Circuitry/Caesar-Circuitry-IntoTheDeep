@@ -2,8 +2,10 @@ package org.firstinspires.ftc.teamcode.Robot.CustomMath;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.opencv.core.Mat;
+
 public class RotatingArmController {
-    private double kP, kI, kD; // PID gains
+    private double kP, kI, kD, kF; // PID gains
 
     private double targetAngle; // target angle for the arm
     private double currentAngle; // current angle of the arm
@@ -18,17 +20,19 @@ public class RotatingArmController {
 
     private ElapsedTime timer;
 
-    public RotatingArmController(double kP, double kI, double kD) {
+    public RotatingArmController(double kP, double kI, double kD, double kF) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
+        this.kF = kF;
         timer = new ElapsedTime();
     }
 
-    public void updateConstants(double kP, double kI, double kD) {
+    public void updateConstants(double kP, double kI, double kD, double kF) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
+        this.kF = kF;
     }
 
     public void setDeadzone(double deadzone) {
@@ -65,6 +69,7 @@ public class RotatingArmController {
         double proportional = kP * error;
         integral += kI * error * deltaTime;
         double derivative = kD * (error - previousError) / deltaTime;
+        double feedForward = kF * Math.signum(currentAngle);
 
         previousError = error;
 

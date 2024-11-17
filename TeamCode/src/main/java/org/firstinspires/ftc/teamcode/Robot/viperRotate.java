@@ -13,17 +13,18 @@ public class viperRotate {
     public static double
             kP = 0.03,//the value that actually corrects error
             kD = 0, //dampens the aggressiveness of P
-            kI = 0; // adjusts for always error
+            kI = 0, // adjusts for always error
+            kF = .1; //adjusts for gravity
     private double TargetAngle = 0, CurrentAngle = 0, Error = 0, EncoderCount = 0, rotatePow = 0, rotatePowPrev= 0;
     private double ticksPer90 = -1498, ticksPerDegree = ticksPer90/90;
 
-    public viperRotate(DcMotor rotate){
+    public viperRotate(DcMotor rotate) {
         this.rotate = rotate;
         this.rotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.PDFLController = new RotatingArmController(kP,kI,kD);
+        this.PDFLController = new RotatingArmController(kP, kI, kD, kF);
     }
     public void updateConstants(){
-        this.PDFLController.updateConstants(kP,kI,kD);
+        this.PDFLController.updateConstants(kP,kI,kD,kF);
     }
 
     public void setTargetAngle(double TargetAngle){ //in degrees
