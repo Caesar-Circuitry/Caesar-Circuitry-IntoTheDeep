@@ -136,7 +136,7 @@ public class autoRed extends LinearOpMode {
                 .setReversed(true)
                 .splineToLinearHeading(new Pose2d(56,-56,Math.toRadians(0)),Math.toRadians(-90))
                 .waitSeconds(1)
-                .strafeTo(new Vector2d(64,-56))
+                .strafeTo(new Vector2d(64.5,-56))
                 .build();
         secondClipToChamber = drive.actionBuilder(new Pose2d(60,-55,Math.toRadians(0)))
                 .setReversed(true)

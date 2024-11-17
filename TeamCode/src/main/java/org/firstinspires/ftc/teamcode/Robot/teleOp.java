@@ -60,10 +60,11 @@ public class teleOp extends LinearOpMode {
     private double vipermax = 16, viperOffset = 20.683, viperLength = 0, viperLengthAdjusted = viperLength + viperOffset, LastViperLengthAdjusted = viperLength + viperOffset, rotateHeightOffset = 14.5, rotateoffset = 40, rotateAngle = 10, rotateServoOffset = .196, rotateServoAngle = (90  - rotateAngle + rotateServoOffset) * (1/270);//inches
     private boolean rightbumper = true, leftbumper = true, servo = false;
     public static double intakeArm = 28.2,IntakeViper = 10, IntakeSubServo = 0.08;
+    private boolean V1RB = true;
 
         /*MATH*/
     public static double neutralAngle = 25, SUBAngle = 13, intakeSample  = 255, intakeSpecimen = 45,basketAngle = 125, HangAngle = 150, BarUpAngle = 90, HANGDOWNANGLE = 360,
-            clawOpen =.9, clawClosed = .62, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = 0.55, clawWristSUB= .05, multiplier =1, viperbasket = 17, viperZero = .1, viperBar = 10;
+            clawOpen =.9, clawClosed = .62, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = 0.55, clawWristSUB= .05, multiplier =1, viperbasket = 17, viperZero = .1, viperBar = 10.5;
     public static double rotateIntSpecimen = 38, viperIntSpecimen = 10, servoIntSpecimen = .08;
     private boolean hangUp = false;
     private boolean firstTime = true, dirState = true; //dirState true up false down
@@ -146,7 +147,12 @@ public class teleOp extends LinearOpMode {
            }
 
            if (gamepad1.right_bumper){
-               viperBar = viperUnStuck;
+               if (V1RB) {
+                   viperBar += .5;
+                   V1RB = false;
+               }
+           }else{
+               V1RB = true;
            }
 
             if (!gamepad2.right_bumper) {
@@ -160,10 +166,12 @@ public class teleOp extends LinearOpMode {
                multiplier = .2;
            }else if(!gamepad1.left_bumper){
                multiplier = 1;
-           } else if (gamepad1.right_bumper && gamepad1.left_bumper) {
+           }
+
+           if (gamepad1.y) {
                 targetPos = Pos.HANG_ANGLE;
-                HangAngle = 145;
-            }else if (targetPos == Pos.HANG_ANGLE && gamepad1.right_bumper && !hangUp) {
+                HangAngle = 155;
+            }else if (targetPos == Pos.HANG_ANGLE && gamepad1.dpad_down && gamepad1.x && !hangUp) {
                 targetPos = Pos.HANG_ANGLE;
                 HangAngle = 0;
                 hangUp = true;
@@ -321,7 +329,7 @@ public class teleOp extends LinearOpMode {
                         dirState = false;
                     }
                 }
-                dirCode(intakeSpecimen, viperZero,clawWristSpecimen);
+                dirCode(intakeSpecimen, viperZero,clawWristSpecimen + .06);
                 break;
         }
     }

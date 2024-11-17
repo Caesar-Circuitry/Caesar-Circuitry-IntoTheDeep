@@ -140,7 +140,7 @@ public class armActions {
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            clawWrist.setPosition(clawWristSpecimen);
+            clawWrist.setPosition(clawWristSpecimen + .14);
             return false;
         }
     }
