@@ -26,23 +26,23 @@ import java.util.Timer;
 @Config
 public class teleOp extends LinearOpMode {
     private List<LynxModule> allHubs;
-    private DcMotor FRM,BRM,FLM,BLM,armRotate,viper;
+    private DcMotor FRM, BRM, FLM, BLM, armRotate, viper;
     private viperRotate rotate;
     private double lf_power, lb_power, rf_power, rb_power;
     public static double tunePos = 0, pos_in = 0;
     private static final double LIFT_TICKS_PER_IN = -125.5; // Example value, adjust based on your motor and gearing
     private DcMotor liftMotor;
     private Motor.Encoder liftEncoder;
-    private Servo clawWrist,claw;
+    private Servo clawWrist, claw;
     private double liftTargetPos_ticks;
     private double liftLastPos_ticks = 0;
     private double liftPower = 0;
     private double prevLiftPower = 0;
-    public static double kp = 0.01,ki = 0,kd = 0;
+    public static double kp = 0.01, ki = 0, kd = 0;
     private PIDController liftController; // Assume you have a PIDController class implemented
-    private ElapsedTime time, servoTimer;
-    public static double viperUnStuck = 7;
-    private enum Pos{
+    private ElapsedTime time;
+
+    private enum Pos {
         ZERO,
         NEUTRAL,
         SUB,
@@ -50,28 +50,28 @@ public class teleOp extends LinearOpMode {
         INT_SPECIMEN,
         BASKET_ANGLE,
         HANG_ANGLE,
-        BAR_ANGLE
+        BAR_ANGLE,
+        SUB_RISE
     }
+
     private Pos targetPos = Pos.ZERO;
     private FtcDashboard dashboard = FtcDashboard.getInstance();
     private Telemetry dashboardTelemetry = dashboard.getTelemetry();
-        /*Math*/
+    /*Math*/
 
-    private double vipermax = 16, viperOffset = 20.683, viperLength = 0, viperLengthAdjusted = viperLength + viperOffset, LastViperLengthAdjusted = viperLength + viperOffset, rotateHeightOffset = 14.5, rotateoffset = 40, rotateAngle = 10, rotateServoOffset = .196, rotateServoAngle = (90  - rotateAngle + rotateServoOffset) * (1/270);//inches
-    private boolean rightbumper = true, leftbumper = true, servo = false;
-    public static double intakeArm = 28.2,IntakeViper = 10, IntakeSubServo = 0.08;
-    private boolean V1RB = true;
-
-        /*MATH*/
-    public static double neutralAngle = 25, SUBAngle = 13, intakeSample  = 255, intakeSpecimen = 45,basketAngle = 125, HangAngle = 150, BarUpAngle = 90, HANGDOWNANGLE = 360,
-            clawOpen =.9, clawClosed = .62, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = 0.55, clawWristSUB= .05, multiplier =1, viperbasket = 17, viperZero = .1, viperBar = 10.5;
-    public static double rotateIntSpecimen = 38, viperIntSpecimen = 10, servoIntSpecimen = .08;
-    private boolean hangUp = false;
+    private double vipermax = 16, viperOffset = 20.683, viperLength = 0, viperLengthAdjusted = viperLength + viperOffset, LastViperLengthAdjusted = viperLength + viperOffset, rotateHeightOffset = 14.5, rotateoffset = 40, rotateAngle = 10, rotateServoOffset = .196, rotateServoAngle = (90 - rotateAngle + rotateServoOffset) * (1 / 270);//inches
+    private boolean rightbumper = true, leftbumper = true;
+    private boolean armSubOverride = false;
+    private boolean overrideFlag = false;
+    /*MATH*/
+    public static double neutralAngle = 25, SUBAngle = 13, intakeSample = 255, intakeSpecimen = 38, basketAngle = 125, HangAngle = 150, BarUpAngle = 90, HANGDOWNANGLE = 360,
+            clawOpen = .9, clawClosed = .62, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = 0.4, clawWristSUB = .05, multiplier = 1,
+            viperbasket = 17, viperZero = .1, viperBar = 7;
     private boolean firstTime = true, dirState = true; //dirState true up false down
+
     @Override
     public void runOpMode() throws InterruptedException {
         time = new ElapsedTime();
-        servoTimer = new ElapsedTime();
         allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
@@ -85,15 +85,15 @@ public class teleOp extends LinearOpMode {
         viper = hardwareMap.get(DcMotor.class, "viper");
         FRM = hardwareMap.get(DcMotor.class, "FRM");
         BRM = hardwareMap.get(DcMotor.class, "BRM");
-        FLM = hardwareMap.get(DcMotor.class,"FLM");
-        BLM = hardwareMap.get(DcMotor.class,"BLM");
+        FLM = hardwareMap.get(DcMotor.class, "FLM");
+        BLM = hardwareMap.get(DcMotor.class, "BLM");
         FRM.setDirection(DcMotorSimple.Direction.REVERSE);
         BRM.setDirection(DcMotorSimple.Direction.REVERSE);
         FRM.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BRM.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         FLM.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BLM.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        armRotate = hardwareMap.get(DcMotor.class,"armRotate");
+        armRotate = hardwareMap.get(DcMotor.class, "armRotate");
         armRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rotate = new viperRotate(armRotate);
 
@@ -102,79 +102,68 @@ public class teleOp extends LinearOpMode {
         time.reset();
         waitForStart();
 
-        while (opModeIsActive()){
+        while (opModeIsActive()) {
             drive();
-           if(gamepad2.a){
-               targetPos = Pos.BASKET_ANGLE;
-               firstTime = true;
-           } else if (gamepad2.x) {
-               viperBar = 6;
-               targetPos = Pos.BAR_ANGLE;
-               firstTime = true;
-               servo = true;
-           } else if (gamepad2.y) {
-               if(servo) {
-                   viperBar = 0;
-                   servoTimer.reset();
-               }
-               if(servoTimer.time()>=.5) {
-                   claw.setPosition(clawOpen);
-               }
-           } else if (gamepad2.b || gamepad1.b) {
-               targetPos = Pos.NEUTRAL;
-               firstTime = true;
-           } else if (gamepad2.right_bumper) {
-               if(rightbumper){
-                   rightbumper = false;
-                   intakeArm += 1;
-               }
-           } else if (gamepad2.left_bumper) {
-                if(leftbumper){
-                    leftbumper = false;
-                    intakeArm -= 1;
+            if (gamepad2.a) {
+                targetPos = Pos.BASKET_ANGLE;
+                firstTime = true;
+            } else if (gamepad2.x) {
+                viperBar = 6;
+                targetPos = Pos.BAR_ANGLE;
+                firstTime = true;
+            } else if (gamepad2.y) {
+                viperBar = 0;
+                claw.setPosition(clawOpen);
+            } else if (gamepad2.b || gamepad1.b) {
+                if (overrideFlag){
+                    targetPos=Pos.SUB_RISE;
+                    overrideFlag = false;
                 }
-           } else if (gamepad2.dpad_up) {
-               targetPos = Pos.INT_SPECIMEN;
-               firstTime = true;
-           }else if (gamepad2.dpad_down){
-               targetPos = Pos.SUB;
-               firstTime = true;
-               intakeArm = 28.2;
-           } else if (gamepad2.left_trigger > 0) {
-               claw.setPosition(clawOpen);
-           } else if (gamepad2.right_trigger > 0) {
-               claw.setPosition(clawClosed);
-           }
-
-           if (gamepad1.right_bumper){
-               if (V1RB) {
-                   viperBar += .5;
-                   V1RB = false;
-               }
-           }else{
-               V1RB = true;
-           }
+                else{
+                    targetPos = Pos.NEUTRAL;
+                    firstTime = true;
+                }
+            } else if (gamepad2.right_bumper) {
+                if (viperLength < vipermax && rightbumper) {
+                    rightbumper = false;
+                    viperLength += 1;
+                }
+            } else if (gamepad2.left_bumper) {
+                if (viperLength > 0 & leftbumper) {
+                    leftbumper = false;
+                    viperLength -= 1;
+                }
+            } else if (gamepad2.dpad_up) {
+                targetPos = Pos.INT_SPECIMEN;
+                firstTime = true;
+            } else if (gamepad2.dpad_down) {
+                targetPos = Pos.SUB;
+                firstTime = true;
+                overrideFlag = true;
+            } else if (gamepad2.left_trigger > 0) {
+                claw.setPosition(clawOpen);
+            } else if (gamepad2.right_trigger > 0) {
+                claw.setPosition(clawClosed);
+            }
 
             if (!gamepad2.right_bumper) {
                 rightbumper = true;
 
-            } if (!gamepad2.left_bumper) {
+            }
+            if (!gamepad2.left_bumper) {
                 leftbumper = true;
             }
 
-            if (gamepad1.left_bumper) {
-               multiplier = .2;
-           }else if(!gamepad1.left_bumper){
-               multiplier = 1;
-           }
-
-           if (gamepad1.y) {
+            if (gamepad1.dpad_down) {
+                multiplier = .2;
+            } else if (!gamepad1.dpad_down) {
+                multiplier = 1;
+            } else if (gamepad1.right_bumper && gamepad1.left_bumper) {
                 targetPos = Pos.HANG_ANGLE;
-                HangAngle = 155;
-            }else if (targetPos == Pos.HANG_ANGLE && gamepad1.dpad_down && gamepad1.x && !hangUp) {
+                HangAngle = 150;
+            } else if (targetPos == Pos.HANG_ANGLE && gamepad1.b) {
                 targetPos = Pos.HANG_ANGLE;
-                HangAngle = 0;
-                hangUp = true;
+                HangAngle = HANGDOWNANGLE;
             }
             dashboardTelemetry.addData("targetPos", targetPos);
 //            dashboardTelemetry.addData("targetViperPos", pos_in);
@@ -194,24 +183,25 @@ public class teleOp extends LinearOpMode {
         }
 
     }
-    private void drive(){
+
+    private void drive() {
         double x = -gamepad1.left_stick_x * multiplier;
         double y = gamepad1.left_stick_y * multiplier;
-        double turn = -gamepad1.right_stick_x/1.2 * multiplier;
+        double turn = -gamepad1.right_stick_x / 1.2;
 
-        double theta = Math.atan2(y,x);
-        double power = Math.hypot(x,y);
+        double theta = Math.atan2(y, x);
+        double power = Math.hypot(x, y);
 
-        double sin = Math.sin(theta -Math.PI/4);
-        double cos = Math.cos(theta -Math.PI/4);
+        double sin = Math.sin(theta - Math.PI / 4);
+        double cos = Math.cos(theta - Math.PI / 4);
         double max = Math.max(Math.abs(sin), Math.abs(cos));
 
-        lf_power = power * cos/max + turn;
-        lb_power = power * sin/max + turn;
-        rf_power = power * sin/max - turn;
-        rb_power = power * cos/max - turn;
+        lf_power = power * cos / max + turn;
+        lb_power = power * sin / max + turn;
+        rf_power = power * sin / max - turn;
+        rb_power = power * cos / max - turn;
 
-        if((power + Math.abs(turn)) > 1) {
+        if ((power + Math.abs(turn)) > 1) {
             lf_power /= power + turn;
             lb_power /= power + turn;
             rf_power /= power + turn;
@@ -219,6 +209,7 @@ public class teleOp extends LinearOpMode {
         }
 
     }
+
     public void liftRunToPosition(double speed_0to1) {
         liftTargetPos_ticks = pos_in * LIFT_TICKS_PER_IN;
         liftPower = liftController.calculate(liftLastPos_ticks, liftTargetPos_ticks) * speed_0to1;
@@ -231,7 +222,8 @@ public class teleOp extends LinearOpMode {
 
         prevLiftPower = liftPower;
     }
-    private void update(){
+
+    private void update() {
         FLM.setPower(lf_power);
         BLM.setPower(lb_power);
         FRM.setPower(rf_power);
@@ -244,119 +236,126 @@ public class teleOp extends LinearOpMode {
 //    boolean firstTime = true;
 //    dirState = //Can be up or down
 
-    private void states(){
-        switch (targetPos){
+    private void states() {
+        switch (targetPos) {
             case NEUTRAL:
-                if (firstTime){
+                if (firstTime) {
                     firstTime = false;
                     time.reset();
-                    if(liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperZero) {
+                    if (liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperZero) {
                         dirState = true;
-                    }
-                    else{
+                    } else {
                         dirState = false;
                     }
                 }
                 dirCode(neutralAngle, viperZero, clawWristPickup);
                 break;
             case SUB:
-                    time.reset();
-                    if(liftLastPos_ticks / LIFT_TICKS_PER_IN <= LastViperLengthAdjusted) {
-                        dirState = true;
-                    }
-                    else{
-                        dirState = false;
-                    }
-                dirCode(intakeArm, IntakeViper, IntakeSubServo);
-                break;
-            case HANG_ANGLE:
-                if(liftLastPos_ticks / LIFT_TICKS_PER_IN <= LastViperLengthAdjusted) {
+                time.reset();
+                if (liftLastPos_ticks / LIFT_TICKS_PER_IN <= LastViperLengthAdjusted) {
                     dirState = true;
-                }
-                else{
+                } else {
                     dirState = false;
                 }
-                dirCode(HangAngle,viperZero,clawWristSpecimen);
+                armMath();
+                dirCode(rotateAngle, viperLength, rotateServoAngle);
+                break;
+            case HANG_ANGLE:
+                if (liftLastPos_ticks / LIFT_TICKS_PER_IN <= LastViperLengthAdjusted) {
+                    dirState = true;
+                } else {
+                    dirState = false;
+                }
+                dirCode(HangAngle, viperZero, clawWristSpecimen);
                 break;
             case INT_SAMPLE:
-                if (firstTime){
+                if (firstTime) {
                     firstTime = false;
                     time.reset();
-                    if(liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperZero) {
+                    if (liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperZero) {
                         dirState = true;
-                    }
-                    else{
+                    } else {
                         dirState = false;
                     }
                 }
-                dirCode(intakeSample, viperZero,clawWristSUB);
+                dirCode(intakeSample, viperZero, clawWristSUB);
                 break;
             case BAR_ANGLE:
-                if (firstTime){
+                if (firstTime) {
                     firstTime = false;
                     time.reset();
-                    servoTimer.reset();
-                    if(liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperBar) {
+                    if (liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperBar) {
                         dirState = true;
-                    }
-                    else{
+                    } else {
                         dirState = false;
                     }
                 }
                 dirCode(BarUpAngle, viperBar, clawWristPickup);
                 break;
             case BASKET_ANGLE:
-                if (firstTime){
+                if (firstTime) {
                     firstTime = false;
                     time.reset();
-                    if(liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperbasket) {
+                    if (liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperbasket) {
                         dirState = true;
-                    }
-                    else{
+                    } else {
                         dirState = false;
                     }
                 }
                 dirCode(basketAngle, viperbasket, clawWristBucket);
                 break;
             case INT_SPECIMEN:
-                if (firstTime){
+                if (firstTime) {
                     firstTime = false;
                     time.reset();
-                    if(liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperZero) {
+                    if (liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperZero) {
                         dirState = true;
-                    }
-                    else{
+                    } else {
                         dirState = false;
                     }
                 }
-                dirCode(intakeSpecimen, viperZero,clawWristSpecimen + .06);
+                dirCode(intakeSpecimen, viperZero, clawWristSpecimen);
+                break;
+            case SUB_RISE: //CODE BUTTON "B" FOR THIS FUNCTION
+                armSubOverride = true;
+                dirCode(rotateAngle+10, viperZero, rotateServoAngle);
                 break;
         }
     }
-    private void dirCode(double rotPos, double viperPos, double wristPos){
-        if(!dirState){//down
-            clawWrist.setPosition(wristPos);
-            if(time.time()>.8) {
-                pos_in = viperPos;
-                if (liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperPos + .3 && liftLastPos_ticks / LIFT_TICKS_PER_IN >= viperPos - .3) {
-                    rotate.setTargetAngle(rotPos);
+
+    private void dirCode(double rotPos, double viperPos, double wristPos) {
+        if (!armSubOverride) {
+            if (!dirState) {//down
+                clawWrist.setPosition(wristPos);
+                if (time.time() > .8) {
+                    pos_in = viperPos;
+                    if (liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperPos + .3 && liftLastPos_ticks / LIFT_TICKS_PER_IN >= viperPos - .3) {
+                        rotate.setTargetAngle(rotPos);
+                    }
                 }
-            }
-        }else if(dirState){//up
-            rotate.setTargetAngle(rotPos);
-            if (rotate.getAngle() <= rotPos +1 && rotate.getAngle() >= rotPos -1){
-                pos_in = viperPos;
-                if (liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperPos + .3 && liftLastPos_ticks / LIFT_TICKS_PER_IN >= viperPos - .3) {
-                    clawWrist.setPosition(wristPos);
+            } else if (dirState) {//up
+                rotate.setTargetAngle(rotPos);
+                if (rotate.getAngle() <= rotPos + 1 && rotate.getAngle() >= rotPos - 1) {
+                    pos_in = viperPos;
+                    if (liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperPos + .3 && liftLastPos_ticks / LIFT_TICKS_PER_IN >= viperPos - .3) {
+                        clawWrist.setPosition(wristPos);
+                    }
                 }
             }
         }
+        else {
+            rotate.setTargetAngle(rotPos);
+            if (rotate.getAngle() <= rotPos + 1 && rotate.getAngle() >= rotPos - 1) {
+                pos_in = viperPos;
+                clawWrist.setPosition(wristPos);
+            }
+        }
     }
-    private void armMath(){
-        //viperLengthAdjusted always has to have viperLength plus viperoffset
-        LastViperLengthAdjusted = viperLengthAdjusted;
-        viperLengthAdjusted = viperLength + viperOffset;
-        rotateAngle = ((Math.acos(rotateHeightOffset/viperLengthAdjusted) - Math.acos(rotateHeightOffset/viperOffset)) * 40) +10;
-        rotateServoAngle = ((90  - rotateAngle) / 270) - rotateServoOffset;//inches
+        private void armMath () {
+            //viperLengthAdjusted always has to have viperLength plus viperoffset
+            LastViperLengthAdjusted = viperLengthAdjusted;
+            viperLengthAdjusted = viperLength + viperOffset;
+            rotateAngle = ((Math.acos(rotateHeightOffset / viperLengthAdjusted) - Math.acos(rotateHeightOffset / viperOffset)) * 40) + 10;
+            rotateServoAngle = ((90 - rotateAngle) / 270) - rotateServoOffset;//inches
+        }
     }
-}
