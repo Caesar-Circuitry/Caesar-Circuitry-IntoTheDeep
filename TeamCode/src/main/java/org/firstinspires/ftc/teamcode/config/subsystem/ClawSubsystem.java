@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.config.RobotConstants;
 
 public class ClawSubsystem {
 
-    private Servo pivot, clawL, clawR;
+    private Servo claw, clawWrist;
 
     /** This is the constructor for the subsystem, it maps the servos to the hardwareMap.
      * The device names should align with the configuration names on the driver hub.
@@ -22,51 +22,33 @@ public class ClawSubsystem {
      * and then call the below constructor in the init() method. */
 
     public ClawSubsystem(HardwareMap hardwareMap) {
-        pivot = hardwareMap.get(Servo.class, "pivot");
-        clawL = hardwareMap.get(Servo.class, "clawL");
-        clawR = hardwareMap.get(Servo.class, "clawR");
+        claw = hardwareMap.get(Servo.class, "claw");
+        clawWrist = hardwareMap.get(Servo.class, "clawWrist");
     }
 
     //------------------------------Close Claws------------------------------//
-    public void closeLClaw() {
-        clawL.setPosition(RobotConstants.closedL);
-    }
 
-    public void closeRClaw() {
-        clawR.setPosition(RobotConstants.closedR);
-    }
-
-    public void closeClaws() {
-        clawL.setPosition(RobotConstants.closedL);
-        clawR.setPosition(RobotConstants.closedR);
+    public void closeClaw() {
+        claw.setPosition(RobotConstants.clawClosed);
     }
 
     //------------------------------Open Claws------------------------------//
-    public void openLClaw() {
-        clawL.setPosition(RobotConstants.openL);
-    }
-
-    public void openRClaw() {
-        clawR.setPosition(RobotConstants.openR);
-    }
-
-    public void openClaws() {
-        clawL.setPosition(RobotConstants.openL);
-        clawR.setPosition(RobotConstants.openR);
+    public void openClaw() {
+        claw.setPosition(RobotConstants.clawOpen);
     }
 
     //------------------------------Claw Rotate------------------------------//
 
-    public void startClaw() {
-        pivot.setPosition(RobotConstants.startClaw);
+    public void clawWristBasket() {
+        clawWrist.setPosition(RobotConstants.clawWristBucket);
     }
 
-    public void groundClaw() {
-        pivot.setPosition(RobotConstants.groundClaw);
+    public void clawWristSpecimen() {
+        clawWrist.setPosition(RobotConstants.clawWristSpecimen);
     }
 
-    public void scoringClaw() {
-        pivot.setPosition(RobotConstants.scoringClaw);
+    public void clawWristSub() {
+        clawWrist.setPosition(RobotConstants.clawWristSUB);
     }
 
 }

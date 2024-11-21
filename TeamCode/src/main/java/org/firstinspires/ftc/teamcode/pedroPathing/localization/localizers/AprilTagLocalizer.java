@@ -98,7 +98,6 @@ public class AprilTagLocalizer extends Localizer {
         limelight = hardwareMap.get(Limelight3A.class,"limelight");
         limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
         limelight.pipelineSwitch(0);
-        limelight.start(); // This tells Limelight to start looking!
 
         // TODO: update this
         cameraOffset = new Pose(0,0);
@@ -279,44 +278,9 @@ public class AprilTagLocalizer extends Localizer {
 
     @Override
     public void resetIMU() {
-
+        backupLocalizer.resetIMU();
     }
-
-    // this custom position library credit Michael from team 14343 (@overkil on Discord)
-    // TODO: will need to be changed for 24-25 season
-    public AprilTagLibrary getCenterStageTagLibrary()
-    {
-        return new AprilTagLibrary.Builder()
-                .addTag(1, "BlueAllianceLeft",
-                        2, new VectorF(61.75f, 41.41f, 4f), DistanceUnit.INCH,
-                        new Quaternion(0.3536f, -0.6124f, 0.6124f, -0.3536f, 0))
-                .addTag(2, "BlueAllianceCenter",
-                        2, new VectorF(61.75f, 35.41f, 4f), DistanceUnit.INCH,
-                        new Quaternion(0.3536f, -0.6124f, 0.6124f, -0.3536f, 0))
-                .addTag(3, "BlueAllianceRight",
-                        2, new VectorF(61.75f, 29.41f, 4f), DistanceUnit.INCH,
-                        new Quaternion(0.3536f, -0.6124f, 0.6124f, -0.3536f, 0))
-                .addTag(4, "RedAllianceLeft",
-                        2, new VectorF(61.75f, -29.41f, 4f), DistanceUnit.INCH,
-                        new Quaternion(0.3536f, -0.6124f, 0.6124f, -0.3536f, 0))
-                .addTag(5, "RedAllianceCenter",
-                        2, new VectorF(61.75f, -35.41f, 4f), DistanceUnit.INCH,
-                        new Quaternion(0.3536f, -0.6124f, 0.6124f, -0.3536f, 0))
-                .addTag(6, "RedAllianceRight",
-                        2, new VectorF(61.75f, -41.41f, 4f), DistanceUnit.INCH,
-                        new Quaternion(0.3536f, -0.6124f, 0.6124f, -0.3536f, 0))
-                .addTag(7, "RedAudienceWallLarge",
-                        5, new VectorF(-70.25f, -40.625f, 5.5f), DistanceUnit.INCH,
-                        new Quaternion(0.5f, -0.5f, -0.5f, 0.5f, 0))
-                .addTag(8, "RedAudienceWallSmall",
-                        2, new VectorF(-70.25f, -35.125f, 4f), DistanceUnit.INCH,
-                        new Quaternion(0.5f, -0.5f, -0.5f, 0.5f, 0))
-                .addTag(9, "BlueAudienceWallSmall",
-                        2, new VectorF(-70.25f, 35.125f, 4f), DistanceUnit.INCH,
-                        new Quaternion(0.5f, -0.5f, -0.5f, 0.5f, 0))
-                .addTag(10, "BlueAudienceWallLarge",
-                        5, new VectorF(-70.25f, 40.625f, 5.5f), DistanceUnit.INCH,
-                        new Quaternion(0.5f, -0.5f, -0.5f, 0.5f, 0))
-                .build();
+    public void start(){
+        limelight.start(); // This tells Limelight to start looking!
     }
 }
