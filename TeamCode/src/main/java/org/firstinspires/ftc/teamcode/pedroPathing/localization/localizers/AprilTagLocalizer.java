@@ -236,6 +236,7 @@ public class AprilTagLocalizer extends Localizer {
     // todo: do this!
     @Override
     public void setPose(Pose setPose) {
+        this.pose = setPose;
     }
 
     /**
@@ -244,6 +245,7 @@ public class AprilTagLocalizer extends Localizer {
     @Override
     public void update() {
         backupLocalizer.update();
+        limelight.updateRobotOrientation(backupLocalizer.getPose().getHeading());
         totalHeading = backupLocalizer.getTotalHeading();
     }
 
@@ -280,6 +282,7 @@ public class AprilTagLocalizer extends Localizer {
     public void resetIMU() {
         backupLocalizer.resetIMU();
     }
+
     public void start(){
         limelight.start(); // This tells Limelight to start looking!
     }
