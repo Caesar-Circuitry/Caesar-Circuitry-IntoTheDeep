@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.config.RobotConstants;
  */
 
 public class ClawSubsystem {
-
     private Servo claw, clawWrist;
 
     /** This is the constructor for the subsystem, it maps the servos to the hardwareMap.
@@ -25,7 +24,6 @@ public class ClawSubsystem {
         claw = hardwareMap.get(Servo.class, "claw");
         clawWrist = hardwareMap.get(Servo.class, "clawWrist");
     }
-
     //------------------------------Close Claws------------------------------//
 
     public void closeClaw() {
