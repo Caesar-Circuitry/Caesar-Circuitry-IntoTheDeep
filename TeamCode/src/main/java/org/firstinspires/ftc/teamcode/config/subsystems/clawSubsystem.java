@@ -6,10 +6,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.config.RobotConstants;
 
 
-public class ClawSubsystem extends SubsystemBase {
+public class clawSubsystem extends SubsystemBase {
     private Servo claw;
 
-    public ClawSubsystem(HardwareMap hardwareMap) {
+    public clawSubsystem(HardwareMap hardwareMap) {
         claw = hardwareMap.get(Servo.class, "claw");
     }
     //------------------------------Close Claw------------------------------//

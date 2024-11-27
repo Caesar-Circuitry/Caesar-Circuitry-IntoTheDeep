@@ -2,13 +2,13 @@ package org.firstinspires.ftc.teamcode.config.Commands.singleCommands.clawComman
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.config.subsystems.ClawSubsystem;
+import org.firstinspires.ftc.teamcode.config.subsystems.clawSubsystem;
 
 public class clawGrab extends CommandBase {
 
-        private final ClawSubsystem subsystem;
+        private final clawSubsystem subsystem;
 
-        public clawGrab(ClawSubsystem subsystem){
+        public clawGrab(clawSubsystem subsystem){
             this.subsystem = subsystem;
             addRequirements(subsystem);
         }
