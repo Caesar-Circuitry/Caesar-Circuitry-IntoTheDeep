@@ -1,15 +1,11 @@
 package org.firstinspires.ftc.teamcode.config;
 
-/**
- * @author Baron Henderson - 20077 The Indubitables
- * @version 2.0, 9/8/2024
- */
+import com.acmerobotics.dashboard.config.Config;
 
-/** Everything that we want to store globally, for example positions of servos, motors, etc. goes in here. **/
+@Config
 public class RobotConstants {
-
-    /** Variables are positions for the claw servos. **/
     public static double
+            zeroAngle = 0,
             neutralAngle = 25,
             SUBAngle = 13,
             intakeSample  = 255,
@@ -24,9 +20,20 @@ public class RobotConstants {
             clawWristBucket = 1,
             clawWristSpecimen = 0.55,
             clawWristSUB= .05,
+            clawWristIntSpecimen = .55,
             multiplier =1,
             viperbasket = 17,
+            viperSub = 5,
             viperZero = .1,
             viperBar = 10.5;
 
+    public enum armPos{
+        ZERO,
+        SUB,
+        NEUTRAL,
+        WALL,
+        HIGH_CHAMBER_PLACE,
+        HIGH_CHAMBER_RELEASE,
+        HIGH_BASKET
+    }
 }

@@ -15,7 +15,7 @@ public class rotatingArmTester extends LinearOpMode {
     public static double targetAngle =0;
     private double ticksPer90 = -1498, ticksPerDegree = ticksPer90/90, CurrentAngle = 0, EncoderCount = 0,rotatePow = 0, rotatePowPrev= 0, targetAngleEnc = 0;
     public static double
-            lKP = 0.03,
+            lKP = 0.07,
             lKI = 0,
             lKD = 0,
             lKF = .1,
@@ -27,7 +27,6 @@ public class rotatingArmTester extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         rotate = hardwareMap.get(DcMotor.class,"armRotate");
         rotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rotate.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         controller = new rotatingArmController(lKP, lKI, lKD, lKF, sKP, sKI, sKD, sKF);
         waitForStart();
         while (opModeIsActive()){
