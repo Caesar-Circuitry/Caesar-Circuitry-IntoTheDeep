@@ -1,0 +1,72 @@
+package org.firstinspires.ftc.teamcode.opmode.auto;
+
+import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.RunCommand;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
+import com.arcrobotics.ftclib.command.WaitUntilCommand;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import org.firstinspires.ftc.teamcode.opmode.auto.paths.Paths;
+import org.firstinspires.ftc.teamcode.config.Commands.commands;
+import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
+import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
+
+@Autonomous(name = "4+0", group = "Hope")
+public class autoFourPlusZero extends CommandOpMode {
+    public PathChain chain;
+    public Follower follower;
+
+    @Override
+    public void initialize() {
+        this.follower = new Follower(hardwareMap);
+        this.follower.setStartingPose(new Pose(10, 60, 0));
+        this.chain = Paths.fourPlusZero;
+        schedule(
+                new SequentialCommandGroup(
+                        commands.sleepUntil(this::opModeIsActive),
+                        //hang preload
+                        commands.followPath(follower, chain.getPath(0)),
+                        commands.sleep(1000),
+
+                        // push 3 samples from spike marks
+                        commands.followPath(follower, chain.getPath(1))
+                                .andThen(commands.followPath(follower, chain.getPath(2)))
+                                .andThen(commands.followPath(follower, chain.getPath(3)))
+                                .andThen(commands.followPath(follower, chain.getPath(4)))
+                                .andThen(commands.followPath(follower, chain.getPath(5)))
+                                .andThen(commands.followPath(follower, chain.getPath(6)))
+                                .andThen(commands.followPath(follower, chain.getPath(7)))
+                                .andThen(commands.followPath(follower, chain.getPath(8))),
+
+                        // go grab 2nd specimen
+                        commands.followPath(follower, chain.getPath(9))
+                                .andThen(commands.followPath(follower, chain.getPath(10))),
+                        commands.sleep(1000),
+
+                        // go hang 2nd specimen
+                        commands.followPath(follower, chain.getPath(11))
+                                .andThen(commands.followPath(follower, chain.getPath(12))),
+                        commands.sleep(1000),
+
+                        // go grab 3rd specimen
+                        commands.followPath(follower, chain.getPath(13))
+                                .andThen(commands.followPath(follower, chain.getPath(14))),
+                        commands.sleep(1000),
+
+                        // go hang 3rd specimen
+                        commands.followPath(follower, chain.getPath(15))
+                                .andThen(commands.followPath(follower, chain.getPath(16))),
+                        commands.sleep(1000),
+
+                        // go grab 4th specimen
+                        commands.followPath(follower, chain.getPath(17))
+                                .andThen(commands.followPath(follower, chain.getPath(18))),
+                        commands.sleep(1000),
+
+                        // go hang 4th specimen
+                        commands.followPath(follower, chain.getPath(19))
+                )
+        );
+    }
+}
