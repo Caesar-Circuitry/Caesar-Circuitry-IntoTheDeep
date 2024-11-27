@@ -36,4 +36,5 @@ public class RobotConstants {
         HIGH_CHAMBER_RELEASE,
         HIGH_BASKET
     }
+    public static armPos prevArmPos = armPos.ZERO;
 }
