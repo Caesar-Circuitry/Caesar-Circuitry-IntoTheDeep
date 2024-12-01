@@ -1,23 +1,20 @@
 package org.firstinspires.ftc.teamcode.opmode.auto;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.WaitCommand;
-import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.config.subsystems.armSubsystem;
 import org.firstinspires.ftc.teamcode.config.subsystems.clawSubsystem;
 import org.firstinspires.ftc.teamcode.config.subsystems.clawWristSubsystem;
 import org.firstinspires.ftc.teamcode.config.subsystems.viperSubsystem;
-import org.firstinspires.ftc.teamcode.opmode.auto.paths.Paths;
+import org.firstinspires.ftc.teamcode.config.paths.Paths;
 import org.firstinspires.ftc.teamcode.config.Commands.commands;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 
-@Autonomous(name = "4+0", group = "Hope")
+@Autonomous(name = "4+0", group = "Hope", preselectTeleOp = "fieldTeleOp")
 public class autoFourPlusZero extends CommandOpMode {
     public PathChain chain;
     public Follower follower;

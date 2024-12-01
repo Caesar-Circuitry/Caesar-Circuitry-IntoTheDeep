@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode.teleop;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.gamepad.TriggerReader;
@@ -8,11 +9,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 
-import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armHighChamberPlaceGroup;
-import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armHighChamberReleaseGroup;
-import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armNeutralGroup;
-import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armSubGroup;
-import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armWallGroup;
+import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armGroup.armHighChamberPlaceGroup;
+import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armGroup.armHighChamberReleaseGroup;
+import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armGroup.armNeutralGroup;
+import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armGroup.armSubGroup;
+import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armGroup.armWallGroup;
 import org.firstinspires.ftc.teamcode.config.Commands.singleCommands.clawCommands.clawGrab;
 import org.firstinspires.ftc.teamcode.config.Commands.singleCommands.clawCommands.clawRelease;
 import org.firstinspires.ftc.teamcode.config.subsystems.armSubsystem;
@@ -22,14 +23,14 @@ import org.firstinspires.ftc.teamcode.config.subsystems.viperSubsystem;
 import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 
-@TeleOp
+@TeleOp(name = "fieldTeleOp", group = "TeleOp")
 @Config
 public class ZTeleOp extends LinearOpMode {
     private Follower follower;
     private final Pose startPose = new Pose(0,0,0);
 
-    GamepadEx driverOp = new GamepadEx(gamepad1);
-    GamepadEx toolOp = new GamepadEx(gamepad2);
+    GamepadEx driverOp;
+    GamepadEx toolOp;
 
     private clawWristSubsystem clawWrist;
     private armSubsystem arm;
@@ -44,6 +45,9 @@ public class ZTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        driverOp = new GamepadEx(gamepad1);
+        toolOp = new GamepadEx(gamepad2);
+
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
 
@@ -55,22 +59,24 @@ public class ZTeleOp extends LinearOpMode {
         arm = new armSubsystem(hardwareMap);
         viper = new viperSubsystem(hardwareMap);
         claw = new clawSubsystem(hardwareMap);
-
         waitForStart();
 
         while (opModeIsActive()) {
             drive();
+            driverOp.readButtons();
+            toolOp.readButtons();
             similarCommands();
             driver2Commands();
             driver1Commands();
-
-
+            CommandScheduler.getInstance().run();
+            telemetry.addData("armPos", arm.getPos());
+            telemetry.update();
 
         }
     }
 
     public void drive() {
-        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, false);
+        follower.setTeleOpMovementVectors(driverOp.getLeftY(), driverOp.getLeftX(), driverOp.getRightX(), false);
         follower.update();
 
         similarCommands();
@@ -91,6 +97,7 @@ public class ZTeleOp extends LinearOpMode {
     }
 
     public void driver2Commands() {
+
         new GamepadButton(toolOp, GamepadKeys.Button.DPAD_UP)
                 .whenActive(() -> {
                     new armWallGroup(clawWrist,arm,viper).schedule(); // Schedule the specimen wall intake command

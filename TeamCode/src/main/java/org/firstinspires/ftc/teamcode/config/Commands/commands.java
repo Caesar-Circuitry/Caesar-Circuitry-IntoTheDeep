@@ -1,16 +1,13 @@
 package org.firstinspires.ftc.teamcode.config.Commands;
 
 import com.arcrobotics.ftclib.command.Command;
-import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.Subsystem;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.WaitUntilCommand;
-import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 
-import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armHighChamberReleaseGroup;
-import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armWallGroup;
-import org.firstinspires.ftc.teamcode.config.Commands.singleCommands.FollowPathCommand;
-import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armHighChamberPlaceGroup;
+import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armGroup.armHighChamberReleaseGroup;
+import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armGroup.armWallGroup;
+import org.firstinspires.ftc.teamcode.config.Commands.singleCommands.driveCommands.FollowPathCommand;
+import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armGroup.armHighChamberPlaceGroup;
 
 import org.firstinspires.ftc.teamcode.config.Commands.singleCommands.clawCommands.clawGrab;
 import org.firstinspires.ftc.teamcode.config.Commands.singleCommands.clawCommands.clawRelease;

@@ -21,7 +21,7 @@ public class viperSubsystem extends SubsystemBase {
     private PIDController liftController;
     private double tunePos = 0, pos_in = 0;
     private double speed_0to1 = 1;
-    private double holdingPow = .1, middlePoint = 110, viperTolerence = 1;
+    private double holdingPow = 0, middlePoint = 110, viperTolerence = 1;
     private RobotConstants.armPos targetPos = RobotConstants.armPos.ZERO;
     public viperSubsystem(HardwareMap hardwareMap){
         liftMotor = hardwareMap.get(DcMotor.class, "viper");

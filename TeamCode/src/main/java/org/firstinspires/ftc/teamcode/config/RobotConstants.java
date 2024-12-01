@@ -12,7 +12,7 @@ public class RobotConstants {
             intakeSpecimen = 45,
             basketAngle = 125,
             HangAngle = 150,
-            BarUpAngle = 90,
+            BarUpAngle = 60,
             HANGDOWNANGLE = 360,
             clawOpen =.9,
             clawClosed = .62,
@@ -37,4 +37,9 @@ public class RobotConstants {
         HIGH_BASKET
     }
     public static armPos prevArmPos = armPos.ZERO;
+    public enum OpModeType
+    {
+        AUTO,
+        TELEOP
+    }
 }
