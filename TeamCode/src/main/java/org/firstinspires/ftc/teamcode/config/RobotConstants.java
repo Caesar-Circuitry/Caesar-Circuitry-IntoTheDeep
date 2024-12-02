@@ -6,13 +6,13 @@ import com.acmerobotics.dashboard.config.Config;
 public class RobotConstants {
     public static double
             zeroAngle = 0,
-            neutralAngle = 25,
-            SUBAngle = 13,
+            neutralAngle = (25 * (90.0/125.0)),
+            SUBAngle = (13 * (90.0/125.0)),
             intakeSample  = 255,
-            intakeSpecimen = 45,
-            basketAngle = 125,
+            intakeSpecimen = (45 * (90.0/125.0)),
+            basketAngle = (125 * (90.0/125.0)),
             HangAngle = 150,
-            BarUpAngle = 60,
+            BarUpAngle = (60 * (90.0/125.0)),
             HANGDOWNANGLE = 360,
             clawOpen =.9,
             clawClosed = .62,
