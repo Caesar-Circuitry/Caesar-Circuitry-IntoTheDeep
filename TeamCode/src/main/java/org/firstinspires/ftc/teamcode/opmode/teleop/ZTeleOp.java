@@ -34,6 +34,8 @@ public class ZTeleOp extends LinearOpMode {
     GamepadEx driverOp;
     GamepadEx toolOp;
 
+    private double driveMultiplier = 1;
+
     private clawWristSubsystem clawWrist;
     private armSubsystem arm;
     private viperSubsystem viper;
@@ -77,7 +79,7 @@ public class ZTeleOp extends LinearOpMode {
     }
 
     public void drive() {
-        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, false);
+        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y * driveMultiplier, -gamepad1.left_stick_x * driveMultiplier, (-gamepad1.right_stick_x * driveMultiplier)/2, false);
         follower.update();
 
         similarCommands();
@@ -167,6 +169,27 @@ public class ZTeleOp extends LinearOpMode {
     }
 
     public void driver1Commands() {
-        //will do later
+        new GamepadButton(driverOp, GamepadKeys.Button.Y)
+                .whenActive(() -> { //need to change command to the actual one when made
+                    new armNeutralGroup(clawWrist,arm,viper).schedule(); // Schedule the arm hang command
+                    new clawRelease(claw).schedule(); // Schedule the claw open command
+                });
+
+        new GamepadButton(driverOp, GamepadKeys.Button.X)
+                .whenActive(() -> {
+                    new armNeutralGroup(clawWrist,arm,viper).schedule(); // Schedule the arm hang down command
+                    new clawRelease(claw).schedule(); // Schedule the claw open command
+                });
+
+        if (gamepad1.left_bumper) {
+                driveMultiplier = .5;
+        } else {
+                driveMultiplier = 1;
+        }
+
+        new GamepadButton(driverOp, GamepadKeys.Button.START)
+                .whenActive(() -> {
+                    follower.setPose(new Pose(follower.getPose().getX(), follower.getPose().getY(),0));
+                });
     }
 }
