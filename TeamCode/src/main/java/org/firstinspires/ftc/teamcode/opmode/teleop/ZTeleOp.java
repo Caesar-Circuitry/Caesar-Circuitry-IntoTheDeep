@@ -77,7 +77,7 @@ public class ZTeleOp extends LinearOpMode {
     }
 
     public void drive() {
-        follower.setTeleOpMovementVectors(driverOp.getLeftY(), driverOp.getLeftX(), driverOp.getRightX(), false);
+        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, false);
         follower.update();
 
         similarCommands();
