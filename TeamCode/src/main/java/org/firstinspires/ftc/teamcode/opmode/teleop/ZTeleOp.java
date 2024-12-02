@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.opmode.teleop;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.gamepad.TriggerReader;
@@ -15,7 +14,6 @@ import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armGroup.arm
 import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armGroup.armNeutralGroup;
 import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armGroup.armSubGroup;
 import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armGroup.armWallGroup;
-import org.firstinspires.ftc.teamcode.config.Commands.singleCommands.armCommands.armUpdate;
 import org.firstinspires.ftc.teamcode.config.Commands.singleCommands.clawCommands.clawGrab;
 import org.firstinspires.ftc.teamcode.config.Commands.singleCommands.clawCommands.clawRelease;
 import org.firstinspires.ftc.teamcode.config.subsystems.armSubsystem;
