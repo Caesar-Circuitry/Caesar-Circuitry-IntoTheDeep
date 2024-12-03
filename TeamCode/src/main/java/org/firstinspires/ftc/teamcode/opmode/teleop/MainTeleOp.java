@@ -2,12 +2,12 @@ package org.firstinspires.ftc.teamcode.opmode.teleop;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.gamepad.TriggerReader;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.arcrobotics.ftclib.command.button.GamepadButton;
 
 import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armGroup.armHighChamberPlaceGroup;
 import org.firstinspires.ftc.teamcode.config.Commands.CommandGroups.armGroup.armHighChamberReleaseGroup;
@@ -20,12 +20,12 @@ import org.firstinspires.ftc.teamcode.config.subsystems.armSubsystem;
 import org.firstinspires.ftc.teamcode.config.subsystems.clawSubsystem;
 import org.firstinspires.ftc.teamcode.config.subsystems.clawWristSubsystem;
 import org.firstinspires.ftc.teamcode.config.subsystems.viperSubsystem;
-import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
+import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 
-@TeleOp(name = "Field Centric TeleOp", group = "TeleOp")
+@TeleOp(name = "Robot Centric TeleOp", group = "TeleOp")
 @Config
-public class ZTeleOp extends LinearOpMode {
+public class MainTeleOp extends LinearOpMode {
     private Follower follower;
     private final Pose startPose = new Pose(0,0,0);
 
@@ -82,7 +82,7 @@ public class ZTeleOp extends LinearOpMode {
     }
 
     public void drive() {
-        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y * driveMultiplier, -gamepad1.left_stick_x * driveMultiplier, (-gamepad1.right_stick_x * driveMultiplier)/2, false);
+        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y * driveMultiplier, -gamepad1.left_stick_x * driveMultiplier, (-gamepad1.right_stick_x * driveMultiplier)/2, true);
         follower.update();
 
         telemetry.addData("X: ", follower.getPose().getX());

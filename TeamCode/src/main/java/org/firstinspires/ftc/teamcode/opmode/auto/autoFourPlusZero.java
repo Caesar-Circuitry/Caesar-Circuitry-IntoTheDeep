@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 
-@Autonomous(name = "4+0", group = "Hope", preselectTeleOp = "fieldTeleOp")
+@Autonomous(name = "4+0", group = "Hope", preselectTeleOp = "Field Centric TeleOp")
 public class autoFourPlusZero extends CommandOpMode {
     public PathChain chain;
     public Follower follower;
