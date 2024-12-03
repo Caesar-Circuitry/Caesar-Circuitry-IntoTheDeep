@@ -1,7 +1,7 @@
 # Caesar Circuitry Into the deep
 Into the Deep code for 24331, Caesar Circuitry
 
-This branch includes Pedro Pathing and implementation of FTClib
+This branch includes Pedro Pathing and an implementation of FTClib
 
 ## NOTICE
 
