@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.Robot.CustomMath.RotatingArmController;
 public class viperRotate {
     private DcMotor rotate;
     private RotatingArmController PDFLController;
+    private boolean cutPower = false;
     public static double
             kP = 0.03,//the value that actually corrects error
             kD = 0, //dampens the aggressiveness of P
@@ -36,18 +37,29 @@ public class viperRotate {
     }
 
     public void periodic() {
-        try {
-            EncoderCount = rotate.getCurrentPosition();
-        }catch (Exception e){
-            EncoderCount = 0;
+        if (!cutPower) {
+            try {
+                EncoderCount = rotate.getCurrentPosition();
+            } catch (Exception e) {
+                EncoderCount = 0;
+            }
+            CurrentAngle = EncoderCount;
+            updateConstants();
+            rotatePow = PDFLController.run(CurrentAngle, TargetAngle);
+            if (rotatePow != rotatePowPrev) {
+                rotate.setPower(rotatePow);
+                rotatePowPrev = rotatePow;
+            }
         }
-        CurrentAngle = EncoderCount;
-        updateConstants();
-        rotatePow = PDFLController.run(CurrentAngle,TargetAngle);
-        if (rotatePow != rotatePowPrev) {
-            rotate.setPower(rotatePow);
-            rotatePowPrev = rotatePow;
+        else if(cutPower){
+            if (0 != rotatePowPrev) {
+                rotate.setPower(0);
+                rotatePowPrev = 0;
+            }
         }
+    }
+    public void switchCutPower(){
+        cutPower = ! cutPower;
     }
 
 }
