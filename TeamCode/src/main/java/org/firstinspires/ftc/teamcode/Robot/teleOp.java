@@ -144,7 +144,13 @@ public class teleOp extends LinearOpMode {
             } else if (gamepad2.left_trigger > 0) {
                 claw.setPosition(clawOpen);
             } else if (gamepad2.right_trigger > 0) {
-                claw.setPosition(clawClosed);
+                if(!armSubOverride) {
+                    claw.setPosition(clawClosed);
+                }else {
+                    armSubOverride = false;
+                    armSubReturnOveride = true;
+                    targetPos = Pos.NEUTRAL;
+                }
             }
 
             if (!gamepad2.right_bumper) {
@@ -240,9 +246,7 @@ public class teleOp extends LinearOpMode {
     private void states() {
         switch (targetPos) {
             case NEUTRAL:
-                if (armSubOverride){
-                    armSubOverride = false;
-                    armSubReturnOveride = true;
+                if (armSubReturnOveride){
                     dirCode(neutralAngle, viperZero, clawWristPickup);
                 }
                 else {
@@ -362,12 +366,12 @@ public class teleOp extends LinearOpMode {
             rotate.switchCutPower();
             claw.setPosition(clawClosed);
             rotate.switchCutPower();
-            armSubReturnOveride = false;
             rotate.setTargetAngle(rotPos);
             if (rotate.getAngle() <= rotPos + 1 && rotate.getAngle() >= rotPos - 1) {
                 pos_in = viperPos;
                 if (liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperPos + .3 && liftLastPos_ticks / LIFT_TICKS_PER_IN >= viperPos - .3) {
                     clawWrist.setPosition(wristPos);
+                    armSubReturnOveride = false;
                 }
             }
         }

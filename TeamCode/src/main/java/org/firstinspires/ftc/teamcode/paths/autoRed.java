@@ -151,7 +151,6 @@ public class autoRed extends LinearOpMode {
         waitForStart();
         if (isStopRequested()) return;
 
-
         Actions.runBlocking(
                 new ParallelAction(
                         new SequentialAction(
