@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.paths;
 
-import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import org.firstinspires.ftc.teamcode.paths.actions.armActions;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
@@ -18,92 +16,131 @@ import org.firstinspires.ftc.teamcode.RoadRunner.MecanumDrive;
 @Config
 @Autonomous(name = "3Clip_Auto", group = "Autonomous")
 public class threeSpeci extends LinearOpMode {
+
     @Override
     public void runOpMode() throws InterruptedException {
         Pose2d initialPose = new Pose2d(12, -58, Math.toRadians(90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
-        Action redClipToBar, redClipNearBar, redClipAwayBar, longWait1, releaseTIme, shortWait, backAwayWait, backAway, grabTime, shortWait1;
-
-        Action redClipToBar1, redClipNearBar1, redClipAwayBar1, longWait2, releaseTIme1, shortWait2, backAwayWait1, backAway1, grabTime1, shortWait3;
 
         armActions actions = new armActions(hardwareMap);
 
-        grabTime = drive.actionBuilder((drive.pose))
-                .waitSeconds(.25)
+        // preload
+        Action preloadInFront, preloadOnBar;
+        Action preloadRaiseArmWait, preloadArmToBarWait, preloadEnsureClipOnBarWait, preloadClipReleaseWait;
+
+        preloadInFront = drive.actionBuilder(drive.pose)
+                .splineToLinearHeading(new Pose2d(6,-38, Math.toRadians(90)), Math.toRadians(90))
                 .build();
-        backAwayWait = drive.actionBuilder((drive.pose))
+        preloadOnBar = drive.actionBuilder(new Pose2d(6,-38,Math.toRadians(90)))
+                .splineToConstantHeading(new Vector2d(6,-25),Math.toRadians(90))
+                .build();
+
+        preloadRaiseArmWait = drive.actionBuilder(drive.pose)
                 .waitSeconds(.5)
                 .build();
-        longWait1 = drive.actionBuilder(drive.pose)
+        preloadArmToBarWait = drive.actionBuilder(drive.pose)
                 .waitSeconds(.75)
                 .build();
-        releaseTIme = drive.actionBuilder(drive.pose)
+        preloadEnsureClipOnBarWait = drive.actionBuilder((drive.pose))
                 .waitSeconds(.5)
                 .build();
-        shortWait = drive.actionBuilder(drive.pose)
-                .waitSeconds(.5)
-                .build();
-        shortWait1 = drive.actionBuilder(drive.pose)
+        preloadClipReleaseWait = drive.actionBuilder(drive.pose)
                 .waitSeconds(.5)
                 .build();
 
-        backAway = drive.actionBuilder((new Pose2d(6,-34,Math.toRadians(90))))
+
+        // 2nd specimen
+        Action speci2BackAwayFromBar, speci2Grab, speci2BackAwayFromWall, speci2InFront, speci2OnBar;
+        Action speci2ArmToIntakeWait, speci2ArmToBarWait, speci2EnsureClipOnBarWait, speci2ClipReleaseWait;
+
+        speci2BackAwayFromBar = drive.actionBuilder(new Pose2d(6,-25,Math.toRadians(90)))
+                .setReversed(true)
+                .splineToConstantHeading(new Vector2d(6,-34), Math.toRadians(90))
+                .build();
+        speci2Grab = drive.actionBuilder((new Pose2d(6,-34,Math.toRadians(90))))
                 .setReversed(true)
                 .splineToLinearHeading(new Pose2d(38,-43, Math.toRadians(270)), Math.toRadians(90))
                 .splineToConstantHeading(new Vector2d(38,-48), Math.toRadians(270))
                 .build();
-        redClipNearBar = drive.actionBuilder(drive.pose)
-                .splineToLinearHeading(new Pose2d(6,-38, Math.toRadians(90)), Math.toRadians(90))
+        speci2BackAwayFromWall = drive.actionBuilder(new Pose2d(38,-48,Math.toRadians(270)))
+                .splineToConstantHeading(new Vector2d(38,-43),Math.toRadians(270))
                 .build();
-        redClipToBar = drive.actionBuilder(new Pose2d(6,-38,Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(6,-25),Math.toRadians(90))
+        speci2InFront = drive.actionBuilder(new Pose2d(38, -43, Math.toRadians(270)))
+                .splineToLinearHeading(new Pose2d(4,-38, Math.toRadians(90)), Math.toRadians(90))
                 .build();
-        redClipAwayBar = drive.actionBuilder(new Pose2d(6,-25,Math.toRadians(90)))
-                .setReversed(true)
-                .splineToConstantHeading(new Vector2d(6,-34), Math.toRadians(90))
+        speci2OnBar = drive.actionBuilder(new Pose2d(4,-38,Math.toRadians(90)))
+                .splineToConstantHeading(new Vector2d(4,-25),Math.toRadians(90))
                 .build();
 
-
-        grabTime1 = drive.actionBuilder((drive.pose))
-                .waitSeconds(.25)
-                .build();
-        backAwayWait1 = drive.actionBuilder((drive.pose))
+        speci2ArmToIntakeWait = drive.actionBuilder(drive.pose)
                 .waitSeconds(.5)
                 .build();
-        longWait2 = drive.actionBuilder(drive.pose)
+        speci2ArmToBarWait = drive.actionBuilder(drive.pose)
                 .waitSeconds(.75)
                 .build();
-        releaseTIme1 = drive.actionBuilder(drive.pose)
+        speci2EnsureClipOnBarWait = drive.actionBuilder((drive.pose))
                 .waitSeconds(.5)
                 .build();
-        shortWait2 = drive.actionBuilder(drive.pose)
-                .waitSeconds(.5)
-                .build();
-        shortWait3 = drive.actionBuilder(drive.pose)
+        speci2ClipReleaseWait = drive.actionBuilder(drive.pose)
                 .waitSeconds(.5)
                 .build();
 
-        backAway1 = drive.actionBuilder((new Pose2d(6,-34,Math.toRadians(90))))
+
+        // 2nd specimen
+        Action speci3BackAwayFromBar, speci3Grab, speci3BackAwayFromWall, speci3InFront, speci3OnBar;
+        Action speci3ArmToIntakeWait, speci3ArmToBarWait, speci3EnsureClipOnBarWait, speci3ClipReleaseWait;
+
+        speci3BackAwayFromBar = drive.actionBuilder(new Pose2d(4,-25,Math.toRadians(90)))
                 .setReversed(true)
-                .splineToLinearHeading(new Pose2d(38,-43, Math.toRadians(270)), Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(38,-48), Math.toRadians(270))
+                .splineToConstantHeading(new Vector2d(4,-34), Math.toRadians(90))
                 .build();
-        redClipNearBar1 = drive.actionBuilder(drive.pose) // up date to backaway ending position
-                .splineToLinearHeading(new Pose2d(6,-38, Math.toRadians(90)), Math.toRadians(90))
-                .build();
-        redClipToBar1 = drive.actionBuilder(new Pose2d(6,-38,Math.toRadians(90)))
-                .splineToConstantHeading(new Vector2d(6,-25),Math.toRadians(90))
-                .build();
-        redClipAwayBar1 = drive.actionBuilder(new Pose2d(6,-25,Math.toRadians(90)))
+        speci3Grab = drive.actionBuilder((new Pose2d(4,-34,Math.toRadians(90))))
                 .setReversed(true)
-                .splineToConstantHeading(new Vector2d(6,-34), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(35,-34), Math.toRadians(90))
+                .waitSeconds(.05)
+                .splineToConstantHeading(new Vector2d(35,-12), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(45,-12), Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(45,-35), Math.toRadians(-90))
+                .waitSeconds(.05)
+                .splineToLinearHeading(new Pose2d(45,-20, Math.toRadians(-135)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(38,-43, Math.toRadians(-90)), Math.toRadians(-135))
+                .strafeToConstantHeading(new Vector2d(38,-48))
                 .build();
+        speci3BackAwayFromWall = drive.actionBuilder(new Pose2d(38,-48,Math.toRadians(270)))
+                .splineToConstantHeading(new Vector2d(38,-43),Math.toRadians(270))
+                .build();
+        speci3InFront = drive.actionBuilder(new Pose2d(38, -43, Math.toRadians(270)))
+                .splineToLinearHeading(new Pose2d(2,-38, Math.toRadians(90)), Math.toRadians(90))
+                .build();
+        speci3OnBar = drive.actionBuilder(new Pose2d(2,-38,Math.toRadians(90)))
+                .splineToConstantHeading(new Vector2d(2,-25),Math.toRadians(90))
+                .build();
+
+        speci3ArmToIntakeWait = drive.actionBuilder(drive.pose)
+                .waitSeconds(.5)
+                .build();
+        speci3ArmToBarWait = drive.actionBuilder(drive.pose)
+                .waitSeconds(.75)
+                .build();
+        speci3EnsureClipOnBarWait = drive.actionBuilder((drive.pose))
+                .waitSeconds(.5)
+                .build();
+        speci3ClipReleaseWait = drive.actionBuilder(drive.pose)
+                .waitSeconds(.5)
+                .build();
+
 
 
         while (!isStopRequested() && !opModeIsActive()) {
             telemetry.addLine("I am ready");
             telemetry.update();
         }
+
+        Actions.runBlocking(
+                new SequentialAction(
+                        actions.clawClose()
+                )
+        );
 
         waitForStart();
         if (isStopRequested()) return;
@@ -112,33 +149,52 @@ public class threeSpeci extends LinearOpMode {
         Actions.runBlocking(
                 new ParallelAction(
                         new SequentialAction(
-                                actions.clawClose(),
-                                grabTime,
                                 actions.traverse(),
-                                shortWait,
+                                preloadRaiseArmWait,
                                 actions.hold(),
-                                redClipNearBar,
+                                preloadInFront,
                                 actions.barUp(),
-                                longWait1,
-                                redClipToBar,
-                                backAwayWait,
+                                preloadArmToBarWait,
+                                preloadOnBar,
+                                preloadEnsureClipOnBarWait,
                                 actions.barDown(),
-                                releaseTIme,
+                                preloadClipReleaseWait,
                                 actions.clawOpen(),
-                                redClipAwayBar,
+
+                                // go grab 2nd specimen and place
+
+                                speci2BackAwayFromBar,
                                 actions.intake(),
-                                shortWait1,
+                                speci2ArmToIntakeWait,
                                 actions.hold(),
-                                backAway,
+                                speci2Grab,
                                 actions.clawClose(),
-                                //add small back away
-                                redClipNearBar1,
+                                speci2BackAwayFromWall,
+                                speci2InFront,
                                 actions.barUp(),
-                                longWait2,
-                                redClipToBar1,
-                                backAwayWait1,
+                                speci2ArmToBarWait,
+                                speci2OnBar,
+                                speci2EnsureClipOnBarWait,
                                 actions.barDown(),
-                                releaseTIme1,
+                                speci2ClipReleaseWait,
+                                actions.clawOpen(),
+
+                                // go grab 3rd specimen, place, and park
+
+                                speci3BackAwayFromBar,
+                                actions.intake(),
+                                speci3ArmToIntakeWait,
+                                actions.hold(),
+                                speci3Grab,
+                                actions.clawClose(),
+                                speci3BackAwayFromWall,
+                                speci3InFront,
+                                actions.barUp(),
+                                speci3ArmToBarWait,
+                                speci3OnBar,
+                                speci3EnsureClipOnBarWait,
+                                actions.barDown(),
+                                speci3ClipReleaseWait,
                                 actions.clawOpen()
                         ),
                         actions.periodic()
