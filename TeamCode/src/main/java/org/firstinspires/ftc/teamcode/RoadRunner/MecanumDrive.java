@@ -51,8 +51,11 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.firstinspires.ftc.teamcode.paths.actions.armActions;
+
 @Config
 public class MecanumDrive {
+    public armActions armPID;
     public static class Params {
         // IMU orientation
         // TODO: fill in these values based on
@@ -61,6 +64,7 @@ public class MecanumDrive {
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+
 
         // drive model parameters
         public double inPerTick = 0.0022404;
@@ -242,6 +246,8 @@ public class MecanumDrive {
         localizer = new ThreeDeadWheelLocalizer(hardwareMap, PARAMS.inPerTick);
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
+// pid
+        armPID = new armActions(hardwareMap);
     }
 
     public void setDrivePowers(PoseVelocity2d powers) {
@@ -257,6 +263,9 @@ public class MecanumDrive {
         leftBack.setPower(wheelVels.leftBack.get(0) / maxPowerMag);
         rightBack.setPower(wheelVels.rightBack.get(0) / maxPowerMag);
         rightFront.setPower(wheelVels.rightFront.get(0) / maxPowerMag);
+
+        //maybe put pid here
+        armPID.periodic();
     }
 
     public final class FollowTrajectoryAction implements Action {
