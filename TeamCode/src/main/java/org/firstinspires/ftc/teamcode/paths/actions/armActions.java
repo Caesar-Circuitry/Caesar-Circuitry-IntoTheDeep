@@ -30,7 +30,7 @@ public class armActions {
     private PIDController liftController; // Assume you have a PIDController class implemented
     private double rotateAngle = 0, viperPos = 0, pos_in = 0, clawWristPos = 0, clawPos = 0;
     public static double neutralAngle = 25, SUBAngle = 13, intakeSample = 255, intakeSpecimen = 30, basketAngle = 125, HangAngle = 150, BarUpAngle = 78, HANGDOWNANGLE = 360,
-            clawOpen = .9, clawClosed = .62, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = 0.5, clawWristSUB = .05, multiplier = 1,
+            clawOpen = 0.45, clawClosed = 0.18, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = 0.5, clawWristSUB = .05, multiplier = 1,
             viperbasket = 17, viperZero = .1, viperBar = 5.5;
     private boolean firstTime = true, dirState = true; //dirState true up false down
 
@@ -43,7 +43,7 @@ public class armActions {
         liftEncoder.reset();
         viper = hardwareMap.get(DcMotor.class, "viper");
         armRotate = hardwareMap.get(DcMotor.class, "armRotate");
-        armRotate.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armRotate.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         armRotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rotate = new viperRotate(armRotate);
         overide = false;
@@ -163,11 +163,14 @@ public class armActions {
     private void liftRunToPosition(double speed_0to1) {
         liftTargetPos_ticks = pos_in * LIFT_TICKS_PER_IN;
         liftPower = liftController.calculate(liftLastPos_ticks, liftTargetPos_ticks) * speed_0to1;
-
+    try {
         liftLastPos_ticks = liftEncoder.getPosition();
+    }catch (Exception e){
+        liftLastPos_ticks = 0;
+    }
 
         if (liftPower != prevLiftPower) {
-            liftMotor.setPower(liftPower);
+            liftMotor.setPower(liftPower + (Math.cos(rotate.getAngle() * (90/123))*.09));
         }
 
         prevLiftPower = liftPower;

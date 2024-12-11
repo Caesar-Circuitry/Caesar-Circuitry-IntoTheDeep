@@ -22,10 +22,10 @@ public class viperRotate {
     public viperRotate(DcMotor rotate) {
         this.rotate = rotate;
         this.rotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        this.PDFLController = new RotatingArmController(kP, kI, kD, kF);
+        this.PDFLController = new RotatingArmController(kP, kI, kD, 0);
     }
     public void updateConstants(){
-        this.PDFLController.updateConstants(kP,kI,kD,kF);
+        this.PDFLController.updateConstants(kP,kI,kD,0);
     }
 
     public void setTargetAngle(double TargetAngle){ //in degrees
@@ -45,7 +45,7 @@ public class viperRotate {
             }
             CurrentAngle = EncoderCount;
             updateConstants();
-            rotatePow = PDFLController.run(CurrentAngle, TargetAngle);
+            rotatePow = PDFLController.run(CurrentAngle, TargetAngle) + (kF * Math.cos(this.getAngle() * 90/123));
             if (rotatePow != rotatePowPrev) {
                 rotate.setPower(rotatePow);
                 rotatePowPrev = rotatePow;

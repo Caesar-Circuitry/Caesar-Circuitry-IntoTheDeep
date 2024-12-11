@@ -66,7 +66,7 @@ public class teleOp extends LinearOpMode {
     private boolean armSubReturnOveride = false;
     /*MATH*/
     public static double neutralAngle = 25, SUBAngle = 13, intakeSample = 255, intakeSpecimen = 38, basketAngle = 125, HangAngle = 150, BarUpAngle = 90, HANGDOWNANGLE = 360,
-            clawOpen = .9, clawClosed = .62, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = 0.4, clawWristSUB = .05, multiplier = 1,
+            clawOpen = 0.45, clawClosed = .18, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = 0.6, clawWristSUB = .05, multiplier = 1,
             viperbasket = 17, viperZero = .1, viperBar = 7;
     private boolean firstTime = true, dirState = true; //dirState true up false down
 
@@ -144,13 +144,8 @@ public class teleOp extends LinearOpMode {
             } else if (gamepad2.left_trigger > 0) {
                 claw.setPosition(clawOpen);
             } else if (gamepad2.right_trigger > 0) {
-                if(!armSubOverride) {
                     claw.setPosition(clawClosed);
-                }else {
-                    armSubOverride = false;
-                    armSubReturnOveride = true;
-                    targetPos = Pos.NEUTRAL;
-                }
+
             }
 
             if (!gamepad2.right_bumper) {
@@ -246,10 +241,6 @@ public class teleOp extends LinearOpMode {
     private void states() {
         switch (targetPos) {
             case NEUTRAL:
-                if (armSubReturnOveride){
-                    dirCode(neutralAngle, viperZero, clawWristPickup);
-                }
-                else {
                     if (firstTime) {
                         firstTime = false;
                         time.reset();
@@ -261,7 +252,6 @@ public class teleOp extends LinearOpMode {
                     }
 
                     dirCode(neutralAngle, viperZero, clawWristPickup);
-                }
                 break;
             case SUB:
                 time.reset();
@@ -350,9 +340,7 @@ public class teleOp extends LinearOpMode {
                 rotate.setTargetAngle(rotPos);
                 if (rotate.getAngle() <= rotPos + 1 && rotate.getAngle() >= rotPos - 1) {
                     pos_in = viperPos;
-                    if (liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperPos + .3 && liftLastPos_ticks / LIFT_TICKS_PER_IN >= viperPos - .3) {
-                        clawWrist.setPosition(wristPos);
-                    }
+                    clawWrist.setPosition(wristPos);
                 }
             }
         }
@@ -361,18 +349,6 @@ public class teleOp extends LinearOpMode {
             if (rotate.getAngle() <= rotPos + 1 && rotate.getAngle() >= rotPos - 1) {
                 pos_in = viperPos;
                 clawWrist.setPosition(wristPos);
-            }
-        } else if (armSubReturnOveride) {
-            rotate.switchCutPower();
-            claw.setPosition(clawClosed);
-            rotate.switchCutPower();
-            rotate.setTargetAngle(rotPos);
-            if (rotate.getAngle() <= rotPos + 1 && rotate.getAngle() >= rotPos - 1) {
-                pos_in = viperPos;
-                if (liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperPos + .3 && liftLastPos_ticks / LIFT_TICKS_PER_IN >= viperPos - .3) {
-                    clawWrist.setPosition(wristPos);
-                    armSubReturnOveride = false;
-                }
             }
         }
     }

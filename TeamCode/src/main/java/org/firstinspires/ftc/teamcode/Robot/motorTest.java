@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Robot;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -23,20 +24,15 @@ public class motorTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        motor = hardwareMap.get(DcMotor.class, motorName);
-        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor = hardwareMap.get(DcMotor.class, "viper");
+        if(Reversed){
+            motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        }else{
+            motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        }
         waitForStart();
         while (opModeIsActive()) {
-//            if (tickTuner) {
-//                motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//                telemetry.addData("encoderTicks", motor.getCurrentPosition());
-//                dashboardTelemetry.addData("encoderTicks", motor.getCurrentPosition());
-//                dashboardTelemetry.update();
-//                telemetry.update();
-//            } else {
                 motor.setPower(speed);
-
-//            }
         }
     }
 }
