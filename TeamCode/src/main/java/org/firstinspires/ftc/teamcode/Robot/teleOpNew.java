@@ -59,8 +59,8 @@ public class teleOpNew extends LinearOpMode {
     private boolean overrideFlag = false;
     private boolean armSubReturnOveride = false;
     /*MATH*/
-    public static double neutralAngle = 25, SUBAngle = 27, intakeSample = 255, intakeSpecimen = 38, basketAngle = 125, HangAngle = 150, BarUpAngle = 90, HANGDOWNANGLE = 360,
-            clawOpen = .9, clawClosed = .62, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = 0.4, clawWristSUB = .05, multiplier = 1,
+    public static double neutralAngle = 25, SUBAngle = 27, intakeSample = 255, intakeSpecimen = 42, basketAngle = 125, HangAngle = 150, BarUpAngle = 90, HANGDOWNANGLE = 0,
+            clawOpen = 0.45, clawClosed = .18, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = 0.6, clawWristSUB = .05, multiplier = 1,
             viperbasket = 17, viperZero = .1, viperBar = 7;
     private boolean firstTime = true, dirState = true; //dirState true up false down
 
@@ -133,24 +133,24 @@ public class teleOpNew extends LinearOpMode {
             }
 
             if (gamepad2.right_bumper && speciHang) {
-                if (viperLength < vipermax && rightbumper) {
+                if (viperBar < vipermax && rightbumper) {
                     rightbumper = false;
-                    viperLength += 1;
+                    viperBar += .5;
                 }
             } else if (gamepad2.left_bumper && speciHang) {
-                if (viperLength > 0 & leftbumper) {
+                if (viperBar > 0 & leftbumper) {
                     leftbumper = false;
-                    viperLength -= 1;
+                    viperBar -= .5;
                 }
             }
 
             if (gamepad2.right_bumper && subIntake) {
-                if (viperLength < vipermax && rightbumper) {
+                if (rightbumper) {
                     rightbumper = false;
                     SUBAngle -= .5;
                 }
             } else if (gamepad2.left_bumper && subIntake) {
-                if (viperLength > 0 & leftbumper) {
+                if (leftbumper) {
                     leftbumper = false;
                     SUBAngle += .5;
                 }
@@ -354,13 +354,13 @@ public class teleOpNew extends LinearOpMode {
                 break;
             case SUB_RISE: //CODE BUTTON "B" FOR THIS FUNCTION
                 armSubOverride = true;
-                dirCode(rotateAngle+20, viperZero, rotateServoAngle + .02);
+                dirCode(rotateAngle+30, viperZero, rotateServoAngle + .02);
                 break;
         }
     }
 
     private void dirCode(double rotPos, double viperPos, double wristPos) {
-        if (!armSubOverride || armSubReturnOveride) {
+        if (!armSubOverride || !armSubReturnOveride) {
             if (!dirState) {//down
                 clawWrist.setPosition(wristPos);
 //                if (time.time() > .8) {
@@ -395,6 +395,7 @@ public class teleOpNew extends LinearOpMode {
                 if (liftLastPos_ticks / LIFT_TICKS_PER_IN <= viperPos + .3 && liftLastPos_ticks / LIFT_TICKS_PER_IN >= viperPos - .3) {
                     clawWrist.setPosition(wristPos);
                     armSubReturnOveride = false;
+                    armSubOverride = false;
                 }
             }
         }

@@ -66,7 +66,7 @@ public class teleOp extends LinearOpMode {
     private boolean armSubReturnOveride = false;
     /*MATH*/
     public static double neutralAngle = 25, SUBAngle = 13, intakeSample = 255, intakeSpecimen = 38, basketAngle = 125, HangAngle = 150, BarUpAngle = 90, HANGDOWNANGLE = 360,
-            clawOpen = .9, clawClosed = .62, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = 0.4, clawWristSUB = .05, multiplier = 1,
+            clawOpen = .4, clawClosed = 0, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = 0.4, clawWristSUB = .05, multiplier = 1,
             viperbasket = 17, viperZero = .1, viperBar = 7;
     private boolean firstTime = true, dirState = true; //dirState true up false down
 

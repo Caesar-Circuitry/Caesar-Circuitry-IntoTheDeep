@@ -30,7 +30,7 @@ public class armActions {
     private PIDController liftController; // Assume you have a PIDController class implemented
     private double rotateAngle = 0, viperPos = 0, pos_in = 0, clawWristPos = 0, clawPos = 0;
     public static double neutralAngle = 25, SUBAngle = 13, intakeSample = 255, intakeSpecimen = 30, basketAngle = 125, HangAngle = 150, BarUpAngle = 78, HANGDOWNANGLE = 360,
-            clawOpen = .9, clawClosed = .62, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = 0.5, clawWristSUB = .05, multiplier = 1,
+            clawOpen = .4, clawClosed = 0, clawWristPickup = .05, clawWristBucket = 1, clawWristSpecimen = 0.5, clawWristSUB = .05, multiplier = 1,
             viperbasket = 17, viperZero = .1, viperBar = 5.5;
     private boolean firstTime = true, dirState = true; //dirState true up false down
 

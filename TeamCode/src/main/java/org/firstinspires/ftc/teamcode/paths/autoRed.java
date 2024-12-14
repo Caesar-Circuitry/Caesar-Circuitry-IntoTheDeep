@@ -144,6 +144,11 @@ public class autoRed extends LinearOpMode {
                 .build();
 
         while (!isStopRequested() && !opModeIsActive()) {
+            Actions.runBlocking(
+                    new SequentialAction(
+                            actions.clawClose()
+                    )
+            );
             telemetry.addLine("I am ready");
             telemetry.update();
         }
