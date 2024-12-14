@@ -33,13 +33,24 @@ public class fourSpeci extends LinearOpMode {
                 )
                 .splineToConstantHeading(new Vector2d(6,-36), Math.toRadians(90))
                 .splineToConstantHeading(new Vector2d(6,-25), Math.toRadians(90))
-                .waitSeconds(.25)
+                .waitSeconds(.5)
                 .stopAndAdd(
                         actions.barDown()
-                )                .setReversed(true)
+                )
+                .stopAndAdd(
+                        actions.clawOpen()
+                )
+                .waitSeconds(1)
+                .setReversed(true)
                 .splineToConstantHeading(new Vector2d(6,-40), Math.toRadians(90))
                 .stopAndAdd(
                         actions.intake()
+                )
+                .stopAndAdd(
+                        actions.intake()
+                )
+                .stopAndAdd(
+                        actions.clawOpen()
                 )
                 .waitSeconds(.001)
 
@@ -57,39 +68,54 @@ public class fourSpeci extends LinearOpMode {
                 .stopAndAdd(
                         actions.clawClose()
                 )
-                .waitSeconds(.001)
+                .waitSeconds(.01)
                 .splineToConstantHeading(new Vector2d(38,-42),Math.toRadians(270))
                 .afterTime(1, actions.barUp())
                 .setReversed(true)
                 .splineToLinearHeading(new Pose2d(4,-32, Math.toRadians(90)), Math.toRadians(90))
                 .splineToConstantHeading(new Vector2d(4,-25),Math.toRadians(90))
-                .waitSeconds(.25)
+                .waitSeconds(.5)
                 .stopAndAdd(
                         actions.barDown()
                 )
+                .stopAndAdd(
+                        actions.clawOpen()
+                )
+                .waitSeconds(1)
 
                 .setReversed(true)
                 .splineToConstantHeading(new Vector2d(6,-40), Math.toRadians(-90))
                 .stopAndAdd(
                         actions.intake()
                 )
+                .stopAndAdd(
+                        actions.intake()
+                )
+                .stopAndAdd(
+                        actions.clawOpen()
+                )
                 .waitSeconds(.001)
+                .waitSeconds(.01)
                 .setReversed(true)
                 .splineToLinearHeading(new Pose2d(38,-43, Math.toRadians(270)), Math.toRadians(-90))
                 .splineToConstantHeading(new Vector2d(38,-48), Math.toRadians(270))
                 .stopAndAdd(
                         actions.clawClose()
                 )
-                .waitSeconds(.001)
+                .waitSeconds(.01)
                 .splineToConstantHeading(new Vector2d(38,-42),Math.toRadians(270))
                 .afterTime(1, actions.barUp())
                 .setReversed(true)
                 .splineToLinearHeading(new Pose2d(2,-32, Math.toRadians(90)), Math.toRadians(90))
                 .splineToConstantHeading(new Vector2d(2,-25),Math.toRadians(90))
-                .waitSeconds(.25)
+                .waitSeconds(.5)
                 .stopAndAdd(
                         actions.barDown()
                 )
+                .stopAndAdd(
+                        actions.clawOpen()
+                )
+                .waitSeconds(1)
 
 //                    .setReversed(true)
 //                    .splineToConstantHeading(new Vector2d(6,-40), Math.toRadians(-90))
@@ -119,6 +145,13 @@ public class fourSpeci extends LinearOpMode {
                 .stopAndAdd(
                         actions.intake()
                 )
+                .stopAndAdd(
+                        actions.intake()
+                )
+                .stopAndAdd(
+                        actions.clawOpen()
+                )
+                .waitSeconds(.001)
                 .strafeToConstantHeading(new Vector2d(38,-48))
 
                 .build();
