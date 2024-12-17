@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.config.subsystem;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.teamcode.config.RobotConstants;
+import org.firstinspires.ftc.teamcode.config.Robot;
 
 /** This is a subsystem, for the claw of our robot
  * Here we make methods to manipulate the servos
@@ -30,29 +30,29 @@ public class ClawSubsystem {
 
     /** This is the closeClaw method, it sets the grab to the closed position defined in RobotConstants. */
     public void closeClaw() {
-        grab.setPosition(RobotConstants.closedClaw);
+        grab.setPosition(Robot.closedClaw);
     }
 
     /** This is the openClaw method, it sets the grab to the open position defined in RobotConstants. */
     public void openClaw() {
-        grab.setPosition(RobotConstants.openClaw);
+        grab.setPosition(Robot.openClaw);
     }
 
     //------------------------------Pivot------------------------------//
 
     /** This is the startClaw method, it sets the pivot to the start position defined in RobotConstants. */
     public void startClaw() {
-        pivot.setPosition(RobotConstants.startClaw);
+        pivot.setPosition(Robot.startClaw);
     }
 
     /** This is the groundClaw method, it sets the pivot to the ground position defined in RobotConstants. */
     public void groundClaw() {
-        pivot.setPosition(RobotConstants.groundClaw);
+        pivot.setPosition(Robot.groundClaw);
     }
 
     /** This is the scoringClaw method, it sets the pivot to the scoring position defined in RobotConstants. */
     public void scoringClaw() {
-        pivot.setPosition(RobotConstants.scoringClaw);
+        pivot.setPosition(Robot.scoringClaw);
     }
 
     //------------------------------Getters------------------------------//
